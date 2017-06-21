@@ -7,13 +7,13 @@ SQL Data Set
 ```java
 public class Fruit {
 
-	@DsColumn("Name")
-	public String name;      // 声明此参数对应列名为Count
-	
-	@DsIgnore
-	public String count;     // 声明此参数不读取
-	
-	public FruitType type;   // 不添加此声明，对应列名与参数名相同
+    @DsColumn("Name")
+    public String name;      // 声明此参数对应列名为Count
+    
+    @DsIgnore
+    public String count;     // 声明此参数不读取
+    
+    public FruitType type;   // 不添加此声明，对应列名与参数名相同
 }
 ```
 
@@ -45,15 +45,15 @@ factory.readArray(list, rs);                           // 读取多个并保存�
 
 ```java
 DsAdapter<Fruit> adapter = new DsAdapter() {
-	@Override
-	public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
-    // t 的基础类型已存在，可以使用
-    // field 为对应需要读取的参数，注意区分多个相同类的对象
-    // rs 为数据来源
-    // columnIndex 对应参数在rs中对应的位置
-    // 注意：结果需要赋值给t
-    t.type = new FruitType(....);
-	}
+    @Override
+    public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
+        // t 的基础类型已存在，可以使用
+        // field 为对应需要读取的参数，注意区分多个相同类的对象
+        // rs 为数据来源
+        // columnIndex 对应参数在rs中对应的位置
+        // 注意：结果需要赋值给t
+        t.type = new FruitType(....);
+    }
 };
 factory.addAdapter(FruitType.class, adapter);
 ```
