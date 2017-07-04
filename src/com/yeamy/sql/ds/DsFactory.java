@@ -3,31 +3,33 @@ package com.yeamy.sql.ds;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class DsFactory<T> {
+	public static boolean DEBUG = false;
+
 	private HashMap<Class<?>, DsAdapter<T>> map;
-	private List<DsField> fields;
+	private List<DsField<T>> fields;
 	private Class<T> clz;
 	private Calendar cal;
 
 	public DsFactory(Class<T> clz) {
 		this.clz = clz;
-		LinkedList<DsField> list = new LinkedList<>();
+		LinkedList<DsField<T>> list = new LinkedList<>();
 		Field[] fields = clz.getFields();
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(DsIgnore.class)) {
 				continue;
 			}
-			DsField f = new DsField(field);
-			if (f.isPrimitive()) {
-				list.addFirst(f);
-			} else {
+			DsField<T> f = new DsField<T>(field);
+			if (f.isNotDefined()) {
 				list.addLast(f);
+			} else {
+				list.addFirst(f);
 			}
 		}
 		this.fields = list;
@@ -45,23 +47,14 @@ public class DsFactory<T> {
 			return null;
 		}
 		while (true) {
-			DsAdapter<T> adapter = map.get(clz);
-			if (adapter != null) {
-				return adapter;
-			}
-			clz = clz.getSuperclass();
 			if (clz == null) {
 				return null;
 			}
-		}
-	}
-
-	private void findColumn(ResultSet rs) throws SQLException {
-		Iterator<DsField> iterator = this.fields.iterator();
-		while (iterator.hasNext()) {
-			DsField dsField = (DsField) iterator.next();
-			if (!dsField.init(rs)) {
-				iterator.remove();
+			DsAdapter<T> adapter = map.get(clz);
+			if (adapter == null) {
+				clz = clz.getSuperclass();
+			} else {
+				return adapter;
 			}
 		}
 	}
@@ -73,46 +66,55 @@ public class DsFactory<T> {
 		return cal;
 	}
 
-	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
-		findColumn(rs);
-		List<DsField> list = this.fields;
-		T t = null;
-		if (rs.next()) {
-			t = clz.newInstance();
-			for (DsField f : list) {
-				f.read(rs, t, this);
+	private List<DsField<T>> findColumn(ResultSet rs) throws SQLException {
+		List<DsField<T>> fields = new ArrayList<>();
+		for (DsField<T> dsField : this.fields) {
+			if (dsField.init(rs, this)) {
+				fields.add(dsField);
 			}
 		}
-		return t;
+		return fields;
 	}
 
-	public void readArray(List<T> out, ResultSet rs)
-			throws SQLException, InstantiationException, IllegalAccessException {
-		findColumn(rs);
-		List<DsField> list = this.fields;
-		while (rs.next()) {
+	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
+		List<DsField<T>> list = findColumn(rs);
+		if (rs.next()) {
 			T t = clz.newInstance();
-			for (DsField f : list) {
+			for (DsField<T> f : list) {
 				f.read(rs, t, this);
 			}
-			out.add(t);
+			if (t instanceof DsObserver) {
+				((DsObserver) t).onDsFinish();
+			}
+			return t;
 		}
+		return null;
 	}
 
 	public void readArray(List<T> out, ResultSet rs, int limit)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		findColumn(rs);
-		List<DsField> list = this.fields;
+		List<DsField<T>> list = findColumn(rs);
 		while (rs.next()) {
-			if (limit-- > 0) {
+			if (limit-- <= 0) {
 				break;
 			}
 			T t = clz.newInstance();
-			for (DsField f : list) {
+			for (DsField<T> f : list) {
 				f.read(rs, t, this);
+			}
+			if (t instanceof DsObserver) {
+				((DsObserver) t).onDsFinish();
 			}
 			out.add(t);
 		}
+	}
+
+	/**
+	 * default read top 200
+	 */
+	public void readArray(List<T> out, ResultSet rs)
+			throws SQLException, InstantiationException, IllegalAccessException {
+		readArray(out, rs, 200);
 	}
 
 }

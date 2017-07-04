@@ -1,59 +1,84 @@
 SQL Data Set
 ===================================
+English | [中文](README-CN.md)
 
-这个项目是一个简单的数据库读取工具，将ResultSet反序列生产对象集。
+This project is a simple tools to unSerialize Java Bean from JDBC ResultSet.
 
-### 1. 声明
+### 1. Annotation
 ```java
 public class Fruit {
 
     @DsColumn("Name")
-    public String name;      // 声明此参数对应列名为Count
+    public String name;      // the column in database is "Name"
     
     @DsIgnore
-    public String count;     // 声明此参数不读取
+    public String count;     // ignore this field
     
-    public FruitType type;   // 不添加此声明，对应列名与参数名相同
+    public FruitType type;   // the name of the column is the same as the field
 }
 ```
 
 ### 2. DsReader
-一般情况使用DsReader工具类快速读取
+Generally, using DsReader is a easy and fast way.
 
 ```java
-Statement stmt = ...;                                 // 数据源
-String sql = "SELECT ...";                            // 筛选的SQL语句
-Fruit apple = DsReader.read(stmt, sql, Fruit.class);
+Statement stmt = ...;                                 // the source
+String sql = "SELECT ...";                            // the sql
+Fruit apple = DsReader.read(stmt, sql, Fruit.class);  // read one
 ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
 ```
 
 ### 3. DsFactory\<T>
-使用工厂类生产对象，工厂类
+Advanced, using The DsFactory to solve custom field reading.
 
 ```java
-java.sql.ResultSet rs = ...;                           // 数据来源
-DsFactory<Fruit> factory = new DsFactory(Fruit.class); // 实例化工厂
+java.sql.ResultSet rs = ...;                           // the data source
+DsFactory<Fruit> factory = new DsFactory(Fruit.class); // build a factory
 
-Fruit apple = factory.read(rs);                        // 读取单个
+Fruit apple = factory.read(rs);                        // read one
+
+factory.readArray(rs);                                 // read array 1
 
 List<Fruit> list = new ArrayList<Fruit>();
-factory.readArray(list, rs);                           // 读取多个并保存到list
+factory.readArray(list, rs);                           // read array 2
 ```
 
 ### 4. DsAdapter\<T>
-工厂类默认支持基本类型、URL、时间、String，所有对应的参数见`com.yeamy.sql.ds.DsType`，其他类型的对象可以使用DsAdapter来创建。
+The DsFactory support base type in sql, such as int, long, String, URL, time. 
+
+Using `DsAdapter` to unserialize custom field.
 
 ```java
 DsAdapter<Fruit> adapter = new DsAdapter() {
+
+	/**
+	 * @param t
+	 *           any other base type field has been unserialized,
+	 * @param field
+	 *           using field.getName() to distinguish same type.
+	 * @param rs
+	 *           jdbc select result,
+	 * @param columnIndex
+	 *           the index of the target column in ResultSet.
+	 */
     @Override
     public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
-        // t 的基础类型已存在，可以使用
-        // field 为对应需要读取的参数，注意区分多个相同类的对象
-        // rs 为数据来源
-        // columnIndex 对应参数在rs中对应的位置
-        // 注意：结果需要赋值给t
         t.type = new FruitType(....);
     }
 };
-factory.addAdapter(FruitType.class, adapter);
+factory.addAdapter(Type.class, adapter);
+```
+
+### 5. DsObserver
+If you want to do anything when the Bean has bean readed, you can implements DsObserver.class, and do it in onDsFinish().
+
+```java
+public class Vegetables implements DsObserver {
+    @DsColumn("Name")
+    public String name;
+    ...
+    @Override
+    public void onDsFinish(){}
+}
+
 ```

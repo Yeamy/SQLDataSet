@@ -4,39 +4,45 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DsField {
+class DsField<T> {
 	int columnIndex;
 	private Field field;
 	private String columnLabel;
 	private DsType dsType;
+	private DsAdapter<T> adapter;
 
 	DsField(Field field) {
 		this.field = field;
+		this.dsType = DsType.getType(field);
+	}
+
+	boolean isNotDefined() {
+		return dsType == DsType.NotDefined;
+	}
+
+	boolean init(ResultSet rs, DsFactory<T> factory) throws SQLException {
+		if (dsType == DsType.NotDefined) {
+			this.adapter = factory.getAdapter(field.getType());
+		}
 		DsColumn column = field.getAnnotation(DsColumn.class);
 		String label = (column == null) ? null : column.value();
-		if (label != null) {
+		if (label != null && label.length() > 0) {
 			columnLabel = label;
 		} else {
 			columnLabel = field.getName();
 		}
-		dsType = DsType.getType(field);
-	}
-
-	boolean isPrimitive() {
-		return dsType == DsType.NotDefined;
-	}
-
-	boolean init(ResultSet rs) throws SQLException {
 		try {
 			this.columnIndex = rs.findColumn(columnLabel);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+			if (DsFactory.DEBUG) {
+				e.printStackTrace();
+			}
+			return adapter != null;
 		}
 	}
 
-	<T> void read(ResultSet rs, T t, DsFactory<T> factory)
+	void read(ResultSet rs, T t, DsFactory<T> factory)
 			throws SQLException, IllegalArgumentException, IllegalAccessException {
 		switch (dsType) {
 		case _boolean:
@@ -80,13 +86,12 @@ class DsField {
 			field.set(t, rs.getTime(columnIndex, factory.getCalendar()));
 			break;
 		case Timestamp:
-			field.set(t, rs.getTimestamp(columnLabel, factory.getCalendar()));
+			field.set(t, rs.getTimestamp(columnIndex, factory.getCalendar()));
 			break;
 		case URL:
 			field.set(t, rs.getURL(columnIndex));
 			break;
 		default:
-			DsAdapter<T> adapter = factory.getAdapter(field.getType());
 			if (adapter != null) {
 				adapter.read(t, field, rs, columnIndex);
 			}
