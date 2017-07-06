@@ -50,16 +50,16 @@ factory.readArray(list, rs);                           // 自定义list
 ```java
 DsAdapter<Fruit> adapter = new DsAdapter() {
 
-	/**
-	 * @param t
-	 *           基础类型的成员变量已读取，可以直接使用
-	 * @param field
-	 *           对应需要读取的参数，使用field.getName()区分
-	 * @param rs
-	 *           数据库搜索结果
-	 * @param columnIndex
-	 *           对应参数在rs中对应的位置
-	 */
+    /**
+     * @param t
+     *           基础类型的成员变量已读取，可以直接使用
+     * @param field
+     *           对应需要读取的参数，使用field.getName()区分
+     * @param rs
+     *           数据库搜索结果
+     * @param columnIndex
+     *           对应参数在rs中对应的位置
+     */
     @Override
     public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
         t.type = new FruitType(....);
