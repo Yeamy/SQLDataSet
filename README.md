@@ -51,16 +51,16 @@ Using `DsAdapter` to unserialize custom field.
 ```java
 DsAdapter<Fruit> adapter = new DsAdapter() {
 
-	/**
-	 * @param t
-	 *           any other base type field has been unserialized,
-	 * @param field
-	 *           using field.getName() to distinguish same type.
-	 * @param rs
-	 *           jdbc select result,
-	 * @param columnIndex
-	 *           the index of the target column in ResultSet.
-	 */
+    /**
+     * @param t
+     *           any other base type field has been unserialized,
+     * @param field
+     *           using field.getName() to distinguish same type.
+     * @param rs
+     *           jdbc select result,
+     * @param columnIndex
+     *           the index of the target column in ResultSet.
+     */
     @Override
     public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
         t.type = new FruitType(....);
