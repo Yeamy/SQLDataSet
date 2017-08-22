@@ -8,11 +8,17 @@ import java.util.List;
 
 public class DsReader {
 
+	@Deprecated
 	public static int getCount(Statement stmt, String countSql)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		return getNum(stmt, countSql);
+	}
+
+	public static int getNum(Statement stmt, String sql)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		ResultSet rs = null;
 		try {
-			rs = stmt.executeQuery(countSql);
+			rs = stmt.executeQuery(sql);
 			return rs.getInt(1);
 		} finally {
 			if (rs != null) {
