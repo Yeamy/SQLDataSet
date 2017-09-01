@@ -1,25 +1,223 @@
 package com.yeamy.sql.ds;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DsReader {
 
-	@Deprecated
-	public static int getCount(Statement stmt, String countSql)
-			throws InstantiationException, IllegalAccessException, SQLException {
-		return getNum(stmt, countSql);
-	}
-
-	public static int getNum(Statement stmt, String sql)
+	public static boolean getBoolean(Statement stmt, String sql, boolean fallback)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
-			return rs.getInt(1);
+			if (rs.next()) {
+				return rs.getBoolean(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static byte getByte(Statement stmt, String sql, byte fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getByte(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static int getInt(Statement stmt, String sql, int fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static long getLong(Statement stmt, String sql, long fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getLong(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static float getFloat(Statement stmt, String sql, float fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getFloat(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static double getDouble(Statement stmt, String sql, double fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getDouble(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static BigDecimal getBigDecimal(Statement stmt, String sql, BigDecimal fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getBigDecimal(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Timestamp getTimestamp(Statement stmt, String sql, Timestamp fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getTimestamp(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Date getDate(Statement stmt, String sql, Date fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getDate(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Time getTime(Statement stmt, String sql, Time fallback)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				return rs.getTime(1);
+			}
+			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static String getString(Statement stmt, String sql)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			return rs.getString(1);
 		} finally {
 			if (rs != null) {
 				try {
