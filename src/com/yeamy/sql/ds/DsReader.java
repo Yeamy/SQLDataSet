@@ -212,12 +212,15 @@ public class DsReader {
 		}
 	}
 
-	public static String getString(Statement stmt, String sql)
+	public static String getString(Statement stmt, String sql, String fallback)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
-			return rs.getString(1);
+			if (rs.next()) {
+				return rs.getString(1);
+			}
+			return fallback;
 		} finally {
 			if (rs != null) {
 				try {
@@ -229,9 +232,9 @@ public class DsReader {
 		}
 	}
 
-	public static <T> T read(Statement stmt, String sql, Class<T> clz, T fallback)
+	public static <T> T read(Statement stmt, String sql, Class<T> clz)
 			throws InstantiationException, IllegalAccessException, SQLException {
-		return read(stmt, sql, new DsFactory<T>(clz), fallback);
+		return read(stmt, sql, new DsFactory<T>(clz), null);
 	}
 
 	public static <T> T read(Statement stmt, String sql, DsFactory<T> factory, T fallback)
@@ -247,28 +250,6 @@ public class DsReader {
 					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
-				}
-			}
-		}
-	}
-
-	public static <T> T read(Statement stmt, String sql, Class<T> clz)
-			throws InstantiationException, IllegalAccessException, SQLException {
-		return read(stmt, sql, new DsFactory<T>(clz));
-	}
-
-	public static <T> T read(Statement stmt, String sql, DsFactory<T> factory)
-			throws SQLException, InstantiationException, IllegalAccessException {
-		ResultSet rs = null;
-		try {
-			rs = stmt.executeQuery(sql);
-			return factory.read(rs);
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (SQLException e) {
-					throw e;
 				}
 			}
 		}
