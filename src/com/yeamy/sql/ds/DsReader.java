@@ -10,10 +10,16 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.yeamy.utils.array.BooleanArray;
+import com.yeamy.utils.array.ByteArray;
+import com.yeamy.utils.array.DoubleArray;
+import com.yeamy.utils.array.FloatArray;
+import com.yeamy.utils.array.IntArray;
+import com.yeamy.utils.array.LongArray;
+
 public class DsReader {
 
-	public static boolean getBoolean(Statement stmt, String sql, boolean fallback)
-			throws SQLException {
+	public static boolean getBoolean(Statement stmt, String sql, boolean fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -32,8 +38,27 @@ public class DsReader {
 		}
 	}
 
-	public static byte getByte(Statement stmt, String sql, byte fallback)
-			throws SQLException {
+	public static boolean[] getBooleanArray(Statement stmt, String sql) throws SQLException {
+		BooleanArray list = new BooleanArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getBoolean(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static byte getByte(Statement stmt, String sql, byte fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -52,8 +77,27 @@ public class DsReader {
 		}
 	}
 
-	public static int getInt(Statement stmt, String sql, int fallback)
-			throws SQLException {
+	public static byte[] getByteArray(Statement stmt, String sql) throws SQLException {
+		ByteArray list = new ByteArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getByte(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static int getInt(Statement stmt, String sql, int fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -72,8 +116,27 @@ public class DsReader {
 		}
 	}
 
-	public static long getLong(Statement stmt, String sql, long fallback)
-			throws SQLException {
+	public static int[] getIntArray(Statement stmt, String sql) throws SQLException {
+		IntArray list = new IntArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getInt(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static long getLong(Statement stmt, String sql, long fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -92,8 +155,27 @@ public class DsReader {
 		}
 	}
 
-	public static float getFloat(Statement stmt, String sql, float fallback)
-			throws SQLException {
+	public static long[] getLongArray(Statement stmt, String sql) throws SQLException {
+		LongArray list = new LongArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getLong(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static float getFloat(Statement stmt, String sql, float fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -112,8 +194,27 @@ public class DsReader {
 		}
 	}
 
-	public static double getDouble(Statement stmt, String sql, double fallback)
-			throws SQLException {
+	public static float[] getFloatArray(Statement stmt, String sql) throws SQLException {
+		FloatArray list = new FloatArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getFloat(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static double getDouble(Statement stmt, String sql, double fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -132,8 +233,27 @@ public class DsReader {
 		}
 	}
 
-	public static BigDecimal getBigDecimal(Statement stmt, String sql, BigDecimal fallback)
-			throws SQLException {
+	public static double[] getDoubleArray(Statement stmt, String sql) throws SQLException {
+		DoubleArray list = new DoubleArray();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getDouble(1));
+			}
+			return list.getArray();
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static BigDecimal getBigDecimal(Statement stmt, String sql, BigDecimal fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -152,8 +272,27 @@ public class DsReader {
 		}
 	}
 
-	public static Timestamp getTimestamp(Statement stmt, String sql, Timestamp fallback)
-			throws SQLException {
+	public static ArrayList<BigDecimal> getBigDecimalArray(Statement stmt, String sql) throws SQLException {
+		ArrayList<BigDecimal> list = new ArrayList<>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getBigDecimal(1));
+			}
+			return list;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Timestamp getTimestamp(Statement stmt, String sql, Timestamp fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -172,8 +311,27 @@ public class DsReader {
 		}
 	}
 
-	public static Date getDate(Statement stmt, String sql, Date fallback)
-			throws SQLException {
+	public static ArrayList<Timestamp> getTimestampArray(Statement stmt, String sql) throws SQLException {
+		ArrayList<Timestamp> list = new ArrayList<>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getTimestamp(1));
+			}
+			return list;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Date getDate(Statement stmt, String sql, Date fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -192,8 +350,27 @@ public class DsReader {
 		}
 	}
 
-	public static Time getTime(Statement stmt, String sql, Time fallback)
-			throws SQLException {
+	public static ArrayList<Date> getDateArray(Statement stmt, String sql) throws SQLException {
+		ArrayList<Date> list = new ArrayList<>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getDate(1));
+			}
+			return list;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static Time getTime(Statement stmt, String sql, Time fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -212,8 +389,27 @@ public class DsReader {
 		}
 	}
 
-	public static String getString(Statement stmt, String sql, String fallback)
-			throws SQLException {
+	public static ArrayList<Time> getTimeArray(Statement stmt, String sql) throws SQLException {
+		ArrayList<Time> list = new ArrayList<>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getTime(1));
+			}
+			return list;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static String getString(Statement stmt, String sql, String fallback) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
@@ -221,6 +417,26 @@ public class DsReader {
 				return rs.getString(1);
 			}
 			return fallback;
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	public static ArrayList<String> getStringArray(Statement stmt, String sql) throws SQLException {
+		ArrayList<String> list = new ArrayList<>();
+		ResultSet rs = null;
+		try {
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				list.add(rs.getString(1));
+			}
+			return list;
 		} finally {
 			if (rs != null) {
 				try {
