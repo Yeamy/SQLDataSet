@@ -15,6 +15,9 @@ public class Fruit {
     public String count;     // ignore this field
     
     public FruitType type;   // the name of the column is the same as the field
+
+    @DsExtra
+    public Skin skin;        // this field is extra instance
 }
 ```
 
@@ -79,6 +82,38 @@ public class Vegetables implements DsObserver {
     ...
     @Override
     public void onDsFinish(){}
+}
+
+```
+
+### 6. DsExtra
+This Annotation work via DsAdapter. Data come from same row of ResultSet can unserialize into a instance which annotation @DsExtra.
+
+source table:
+
+|UserName|Province|CityName|...|
+|:-:|:-:|:-:|:-:|
+|Nike|Guangdong|Shantou|...|
+|...|
+
+unserialize class：
+
+```java
+public class User {
+    @DsColumn("UserName")
+    public String name;
+    ...
+    @DsExtra
+    public City city;
+}
+
+public class City {
+    @DsColumn("Province")
+    public String province;
+
+    @DsColumn("CityName")
+    public String name;
+    ...
 }
 
 ```

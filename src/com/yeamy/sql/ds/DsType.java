@@ -24,6 +24,7 @@ public enum DsType {
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
 	NotDefined(Object.class), //
+	Extra(Object.class), //
 	;
 
 	private Class<?> type;
@@ -43,6 +44,9 @@ public enum DsType {
 			if (src.isAssignableFrom(type.type)) {
 				return type;
 			}
+		}
+		if (field.isAnnotationPresent(DsExtra.class)) {
+			return Extra;
 		}
 		return NotDefined;
 	}

@@ -15,6 +15,9 @@ public class Fruit {
     public String count;     // 声明此参数不读取
     
     public FruitType type;   // 不添加此声明，对应列名与参数名相同
+
+    @DsExtra
+    public Skin skin;   // 声明此参数为扩展参数
 }
 
 ```
@@ -78,6 +81,38 @@ public class Vegetables implements DsObserver {
     ...
     @Override
     public void onDsFinish(){}
+}
+
+```
+
+### 6. DsExtra
+该声明由DsAdapter实现。来自ResultSet的同一行数据可以被解析到同一实例内。
+
+数据表:
+
+|UserName|Province|CityName|...|
+|:-:|:-:|:-:|:-:|
+|Nike|Guangdong|Shantou|...|
+|...|
+
+数据类：
+
+```java
+public class User {
+    @DsColumn("UserName")
+    public String name;
+    ...
+    @DsExtra
+    public City city;
+}
+
+public class City {
+    @DsColumn("Province")
+    public String province;
+
+    @DsColumn("CityName")
+    public String name;
+    ...
 }
 
 ```

@@ -16,11 +16,15 @@ class DsField<T> {
 		this.dsType = DsType.getType(field);
 	}
 
-	boolean isNotDefined() {
-		return dsType == DsType.NotDefined;
+	public boolean isBaseType() {
+		return dsType != DsType.NotDefined && dsType == DsType.Extra;
 	}
 
 	boolean init(ResultSet rs, DsFactory<T> factory) throws SQLException {
+		if (dsType == DsType.Extra) {
+			this.adapter = factory.getAdapter(field.getType());
+			return true;
+		}
 		if (dsType == DsType.NotDefined) {
 			this.adapter = factory.getAdapter(field.getType());
 		}
@@ -43,7 +47,7 @@ class DsField<T> {
 	}
 
 	void read(ResultSet rs, T t, DsFactory<T> factory)
-			throws SQLException, IllegalArgumentException, IllegalAccessException {
+			throws SQLException, InstantiationException, IllegalAccessException {
 		switch (dsType) {
 		case _boolean:
 		case Boolean:
@@ -94,6 +98,7 @@ class DsField<T> {
 		default:
 			if (adapter != null) {
 				adapter.read(t, field, rs, columnIndex);
+
 			}
 		}
 	}

@@ -24,12 +24,15 @@ public class DsFactory<T> {
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(DsIgnore.class)) {
 				continue;
+			} else if (field.isAnnotationPresent(DsExtra.class)) {
+				Class<?> t = field.getType();
+				addAdapter(t, new DsExAdapter<T>(t));
 			}
 			DsField<T> f = new DsField<T>(field);
-			if (f.isNotDefined()) {
-				list.addLast(f);
-			} else {
+			if (f.isBaseType()) {
 				list.addFirst(f);
+			} else {
+				list.addLast(f);
 			}
 		}
 		this.fields = list;
@@ -76,19 +79,29 @@ public class DsFactory<T> {
 		return fields;
 	}
 
+	private T read(ResultSet rs, List<DsField<T>> list)
+			throws SQLException, InstantiationException, IllegalAccessException {
+		T t = clz.newInstance();
+		for (DsField<T> f : list) {
+			f.read(rs, t, this);
+		}
+		if (t instanceof DsObserver) {
+			((DsObserver) t).onDsFinish();
+		}
+		return t;
+	}
+
 	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
 		List<DsField<T>> list = findColumn(rs);
 		if (rs.next()) {
-			T t = clz.newInstance();
-			for (DsField<T> f : list) {
-				f.read(rs, t, this);
-			}
-			if (t instanceof DsObserver) {
-				((DsObserver) t).onDsFinish();
-			}
-			return t;
+			return read(rs, list);
 		}
 		return null;
+	}
+
+	public T readExtra(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
+		List<DsField<T>> list = findColumn(rs);
+		return read(rs, list);
 	}
 
 	public void readArray(List<T> out, ResultSet rs, int limit)
@@ -98,14 +111,7 @@ public class DsFactory<T> {
 			if (limit-- <= 0) {
 				break;
 			}
-			T t = clz.newInstance();
-			for (DsField<T> f : list) {
-				f.read(rs, t, this);
-			}
-			if (t instanceof DsObserver) {
-				((DsObserver) t).onDsFinish();
-			}
-			out.add(t);
+			out.add(read(rs, list));
 		}
 	}
 
