@@ -4,50 +4,73 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DsField<T> {
-	int columnIndex;
+class DsField {
 	private Field field;
-	private String columnLabel;
 	private DsType dsType;
-	private DsAdapter<T> adapter;
+	private DsAdapter adapter;
+	transient int columnIndex;
 
-	DsField(Field field) {
-		this.field = field;
-		this.dsType = DsType.getType(field);
-	}
-
-	public boolean isBaseType() {
-		return dsType != DsType.NotDefined && dsType == DsType.Extra;
-	}
-
-	boolean init(ResultSet rs, DsFactory<T> factory) throws SQLException {
-		if (dsType == DsType.Extra) {
-			this.adapter = factory.getAdapter(field.getType());
-			return true;
+	static DsField get(Field field, DsFactory<?> factory) {
+		DsType dsType = DsType.getDsType(field);
+		if (dsType == DsType.Extra) {// extra type
+			Class<?> type = field.getType();
+			DsAdapter adapter = factory.getAdapter(type);
+			if (adapter == null) {// not defined
+				if (field.isAnnotationPresent(DsColumn.class)) {
+					return null;
+				} else {
+					adapter = new DsExAdapter(type);
+					factory.addAdapter(type, adapter);
+					return new DsField(field, dsType, adapter);
+				}
+			} else {
+				return new DsField(field, dsType, adapter);
+			}
+		} else {// base type
+			return new DsField(field, dsType, null);
 		}
-		if (dsType == DsType.NotDefined) {
-			this.adapter = factory.getAdapter(field.getType());
+	}
+
+	private DsField(Field field, DsType dsType, DsAdapter adapter) {
+		this.field = field;
+		this.dsType = dsType;
+		this.adapter = adapter;
+	}
+
+	boolean isBaseType() {
+		return adapter == null;
+	}
+
+	boolean findColumnIndex(ResultSet rs) {
+		if (adapter != null && adapter instanceof DsExAdapter) {
+			DsExAdapter exAdapter = (DsExAdapter) adapter;
+			return exAdapter.findColumnIndex(rs);
 		}
 		DsColumn column = field.getAnnotation(DsColumn.class);
 		String label = (column == null) ? null : column.value();
+		String columnLabel;
 		if (label != null && label.length() > 0) {
 			columnLabel = label;
 		} else {
 			columnLabel = field.getName();
 		}
 		try {
-			this.columnIndex = rs.findColumn(columnLabel);
+			columnIndex = rs.findColumn(columnLabel);
 			return true;
 		} catch (Exception e) {
 			if (DsFactory.DEBUG) {
 				e.printStackTrace();
 			}
-			return adapter != null;
+			return false;
 		}
 	}
 
-	void read(ResultSet rs, T t, DsFactory<T> factory)
+	void read(ResultSet rs, Object t, DsFactory<?> factory)
 			throws SQLException, InstantiationException, IllegalAccessException {
+		if (adapter != null) {
+			adapter.read(t, field, rs, columnIndex);
+			return;
+		}
 		switch (dsType) {
 		case _boolean:
 		case Boolean:
@@ -96,10 +119,6 @@ class DsField<T> {
 			field.set(t, rs.getURL(columnIndex));
 			break;
 		default:
-			if (adapter != null) {
-				adapter.read(t, field, rs, columnIndex);
-
-			}
 		}
 	}
 

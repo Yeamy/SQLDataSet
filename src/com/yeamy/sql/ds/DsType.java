@@ -23,7 +23,6 @@ public enum DsType {
 	Time(java.sql.Time.class), //
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
-	NotDefined(Object.class), //
 	Extra(Object.class), //
 	;
 
@@ -37,7 +36,7 @@ public enum DsType {
 		return type;
 	}
 
-	public static DsType getType(Field field) {
+	public static DsType getDsType(Field field) {
 		DsType[] types = DsType.values();
 		Class<?> src = field.getType();
 		for (DsType type : types) {
@@ -45,10 +44,7 @@ public enum DsType {
 				return type;
 			}
 		}
-		if (field.isAnnotationPresent(DsExtra.class)) {
-			return Extra;
-		}
-		return NotDefined;
+		return Extra;
 	}
 
 }
