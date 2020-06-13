@@ -14,10 +14,9 @@ public class Fruit {
     @DsIgnore
     public String count;     // 声明此参数不读取
     
-    public FruitType type;   // 不添加此声明，对应列名与参数名相同
+    public FruitType type;   // 不添加此声明，取参数名做列名，此参数为自定义类型（见下文 DsAdapter）
 
-    @DsExtra
-    public Skin skin;   // 声明此参数为扩展参数
+    public Skin skin;        // 没有声明DsColumn的参数当做扩展参数处理
 }
 
 ```
@@ -29,29 +28,18 @@ public class Fruit {
 Statement stmt = ...;                                 // 数据源
 String sql = "SELECT ...";                            // 筛选的SQL语句
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);
-ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
+ArrayList<Fruit> list = r DsReader.readArray(stmt, sql, Fruit.class);
 ```
 
-### 3. DsFactory\<T>
-使用工厂类生产对象，工厂类
+### 3. DsFactory\<T> 和 DsAdapter
+使用自定义工厂类生产对象，添加DsAdapter来扩展自定义类型。
 
 ```java
 java.sql.ResultSet rs = ...;                           // 数据来源
+
 DsFactory<Fruit> factory = new DsFactory(Fruit.class); // 实例化工厂
 
-Fruit apple = factory.read(rs);                        // 读取单个
-
-factory.readArray(list, rs);                           // 读取多个
-
-List<Fruit> list = new ArrayList<Fruit>();
-factory.readArray(list, rs);                           // 自定义list
-```
-
-### 4. DsAdapter\<T>
-工厂类默认支持基本类型、URL、时间、String，所有对应的参数见`com.yeamy.sql.ds.DsType`，其他类型的对象可以使用DsAdapter来创建。
-
-```java
-DsAdapter<Fruit> adapter = new DsAdapter() {
+DsAdapter adapter = new DsAdapter() {
 
     /**
      * @param t
@@ -64,18 +52,29 @@ DsAdapter<Fruit> adapter = new DsAdapter() {
      *           对应参数在rs中对应的位置
      */
     @Override
-    public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
-        t.type = new FruitType(....);
+    public void read(Object t, Field field, ResultSet rs, int columnIndex) throws SQLException, InstantiationException, IllegalAccessException {
+        FruitType type = new FruitType(....);
+        field.set(t, type);
     }
 };
-factory.addAdapter(Type.class, adapter);
+
+factory.addAdapter(Type.class, adapter);               // 添加自定义类型
+
+Fruit apple = factory.read(rs);                        // 读取单个
+
+factory.readArray(list, rs);                           // 读取多个
+
+List<Fruit> list = new ArrayList<Fruit>();
+factory.readArray(list, rs);                           // 自定义list
 ```
 
-### 5. DsObserver
+
+### 4. DsObserver
 如果导入DsObserver接口，解析结束后会调用onDsFinish()方法，可以在此方法修改数据。
 
 ```java
 public class Vegetables implements DsObserver {
+
     @DsColumn("Name")
     public String name;
     ...
@@ -85,8 +84,8 @@ public class Vegetables implements DsObserver {
 
 ```
 
-### 6. DsExtra
-该声明由DsAdapter实现。来自ResultSet的同一行数据可以被解析到同一实例内。
+### 5. 扩展对象
+来自ResultSet的同一行数据可以被解析到同一实例内。
 
 数据表:
 
@@ -95,15 +94,33 @@ public class Vegetables implements DsObserver {
 |Nike|Guangdong|Shantou|...|
 |...|
 
-数据类：
+通常会采用如下数据类：
+
+```java
+public class User {
+    @DsColumn("UserName")
+    public String name;
+
+    @DsColumn("Province")
+    public String province;
+
+    @DsColumn("CityName")
+    public String city;
+    ...
+}
+
+```
+
+为了将province和city封装到同个参数内，可以使用如下方式：
 
 ```java
 public class User {
     @DsColumn("UserName")
     public String name;
     ...
-    @DsExtra
-    public City city;
+    // 注意：参数不能声明DsColumn，参数名不能与列名重复，
+    // 否则只能使用DsAdapter来解析
+    public City location;
 }
 
 public class City {
@@ -111,7 +128,7 @@ public class City {
     public String province;
 
     @DsColumn("CityName")
-    public String name;
+    public String city;
     ...
 }
 

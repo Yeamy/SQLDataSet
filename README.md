@@ -15,14 +15,14 @@ public class Fruit {
     public String count;     // ignore this field
     
     public FruitType type;   // the name of the column is the same as the field
+                             // regist as custom type (see DsAdapter)
 
-    @DsExtra
-    public Skin skin;        // this field is extra instance
+    public Skin skin;        // this field no DsColumn treat as extra type
 }
 ```
 
 ### 2. DsReader
-Generally, using DsReader is a easy and fast way.
+Generally, using `DsReader` is a easy and fast way.
 
 ```java
 Statement stmt = ...;                                 // the source
@@ -31,32 +31,21 @@ Fruit apple = DsReader.read(stmt, sql, Fruit.class);  // read one
 ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
 ```
 
-### 3. DsFactory\<T>
-Advanced, using The DsFactory to solve custom field reading.
-
-```java
-java.sql.ResultSet rs = ...;                           // the data source
-DsFactory<Fruit> factory = new DsFactory(Fruit.class); // build a factory
-
-Fruit apple = factory.read(rs);                        // read one
-
-factory.readArray(rs);                                 // read array 1
-
-List<Fruit> list = new ArrayList<Fruit>();
-factory.readArray(list, rs);                           // read array 2
-```
-
-### 4. DsAdapter\<T>
-The DsFactory support base type in sql, such as int, long, String, URL, time. 
+### 3. DsFactory\<T> & DsAdapter
+The `DsFactory` support base type in sql, such as int, long, String, URL, time. 
 
 Using `DsAdapter` to unserialize custom field.
 
 ```java
-DsAdapter<Fruit> adapter = new DsAdapter() {
+java.sql.ResultSet rs = ...;                           // the data source
+
+DsFactory<Fruit> factory = new DsFactory(Fruit.class); // build a factory
+
+DsAdapter adapter = new DsAdapter() {
 
     /**
      * @param t
-     *           any other base type field has been unserialized,
+     *           any other base type field has been unserialized
      * @param field
      *           using field.getName() to distinguish same type.
      * @param rs
@@ -65,18 +54,28 @@ DsAdapter<Fruit> adapter = new DsAdapter() {
      *           the index of the target column in ResultSet.
      */
     @Override
-    public void read(Fruit t, Field field, ResultSet rs, int columnIndex) {
-        t.type = new FruitType(....);
+    public void read(Object t, Field field, ResultSet rs, int columnIndex) throws SQLException, InstantiationException, IllegalAccessException {
+        FruitType type = new FruitType(....);
+        field.set(t, type);
     }
 };
-factory.addAdapter(Type.class, adapter);
+
+factory.addAdapter(Type.class, adapter);               // add custom type
+
+Fruit apple = factory.read(rs);                        // read one
+
+factory.readArray(list, rs);                           // read array
+
+List<Fruit> list = new ArrayList<Fruit>();
+factory.readArray(list, rs);                           // read array with custom list
 ```
 
-### 5. DsObserver
-If you want to do anything when the Bean has bean readed, you can implements DsObserver.class, and do it in onDsFinish().
+### 4. DsObserver
+If you want to do anything when the Bean has been readed, you can implements `DsObserver.class`, and do it in `onDsFinish()`.
 
 ```java
 public class Vegetables implements DsObserver {
+
     @DsColumn("Name")
     public String name;
     ...
@@ -86,8 +85,8 @@ public class Vegetables implements DsObserver {
 
 ```
 
-### 6. DsExtra
-This Annotation work via DsAdapter. Data come from same row of ResultSet can unserialize into a instance which annotation @DsExtra.
+### 5. Extra Field
+Data come from same row of ResultSet can unserialize into a extra field.
 
 source table:
 
@@ -96,23 +95,45 @@ source table:
 |Nike|Guangdong|Shantou|...|
 |...|
 
-unserialize class：
+Usually, unserialize like this:
 
 ```java
 public class User {
+
     @DsColumn("UserName")
     public String name;
-    ...
-    @DsExtra
-    public City city;
-}
 
-public class City {
     @DsColumn("Province")
     public String province;
 
     @DsColumn("CityName")
+    public String city;
+    ...
+}
+
+```
+
+to package `province` and `city` into same field `location`, see below:
+
+```java
+public class User {
+
+    @DsColumn("UserName")
     public String name;
+    ...
+
+    // NOTICE：must without annotion DsColumn, field name cannot as same sa column,
+    // otherwise using DsAdapter instead
+    public City location;
+}
+
+public class City {
+
+    @DsColumn("Province")
+    public String province;
+
+    @DsColumn("CityName")
+    public String city;
     ...
 }
 

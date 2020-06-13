@@ -32,10 +32,6 @@ public enum DsType {
 		this.type = type;
 	}
 
-	public Class<?> getType() {
-		return type;
-	}
-
 	public static DsType getDsType(Field field) {
 		DsType[] types = DsType.values();
 		Class<?> src = field.getType();
