@@ -4,6 +4,8 @@ SQL Data Set
 
 这个项目是一个简单的数据库读取工具，将ResultSet反序列生成对象集。
 
+Android平台SQLite可以看这里[SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
+
 ### 1. Bean类声明
 ```java
 public class Fruit {
