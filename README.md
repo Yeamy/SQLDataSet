@@ -4,6 +4,8 @@ English | [中文](README-CN.md)
 
 This project is a simple tools to unSerialize Java Bean from JDBC ResultSet.
 
+For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
+
 ### 1. Annotation
 ```java
 public class Fruit {
