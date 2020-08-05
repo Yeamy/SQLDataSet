@@ -114,12 +114,9 @@ public class DsFactory<T> {
 		}
 	}
 
-	/**
-	 * default read top 200
-	 */
 	public void readArray(List<T> out, ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		readArray(out, rs, 200);
+		readArray(out, rs, Integer.MAX_VALUE);
 	}
 
 }
