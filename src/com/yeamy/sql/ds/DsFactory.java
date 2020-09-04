@@ -116,7 +116,10 @@ public class DsFactory<T> {
 
 	public void readArray(List<T> out, ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		readArray(out, rs, Integer.MAX_VALUE);
+		List<DsField> list = findColumnIndex(rs);
+		while (rs.next()) {
+			out.add(read(rs, list));
+		}
 	}
 
 }
