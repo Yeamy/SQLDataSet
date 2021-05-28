@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import com.yeamy.utils.array.BooleanArray;
 import com.yeamy.utils.array.ByteArray;
@@ -430,13 +430,17 @@ public class DsReader {
 
 	public static ArrayList<String> getStringArray(Statement stmt, String sql) throws SQLException {
 		ArrayList<String> list = new ArrayList<>();
+		getStringArray(stmt, sql, list);
+		return list;
+	}
+
+	public static void getStringArray(Statement stmt, String sql, Collection<String> out) throws SQLException {
 		ResultSet rs = null;
 		try {
 			rs = stmt.executeQuery(sql);
 			while (rs.next()) {
-				list.add(rs.getString(1));
+				out.add(rs.getString(1));
 			}
-			return list;
 		} finally {
 			if (rs != null) {
 				try {
@@ -478,12 +482,24 @@ public class DsReader {
 		return out;
 	}
 
-	public static <T> void readArray(Statement stmt, String sql, Class<T> clz, List<T> out)
+	public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> clz, int limit)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		ArrayList<T> out = new ArrayList<>();
+		readArray(stmt, sql, new DsFactory<T>(clz), limit, out);
+		return out;
+	}
+
+	public static <T> void readArray(Statement stmt, String sql, Class<T> clz, Collection<T> out)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		readArray(stmt, sql, new DsFactory<T>(clz), out);
 	}
 
-	public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, List<T> out)
+	public static <T> void readArray(Statement stmt, String sql, Class<T> clz, int limit, Collection<T> out)
+			throws InstantiationException, IllegalAccessException, SQLException {
+		readArray(stmt, sql, new DsFactory<T>(clz), limit, out);
+	}
+
+	public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, Collection<T> out)
 			throws SQLException, InstantiationException, IllegalAccessException {
 		ResultSet rs = null;
 		try {
@@ -500,14 +516,7 @@ public class DsReader {
 		}
 	}
 
-	public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> clz, int limit)
-			throws InstantiationException, IllegalAccessException, SQLException {
-		ArrayList<T> out = new ArrayList<>();
-		readArray(stmt, sql, new DsFactory<T>(clz), limit, out);
-		return out;
-	}
-
-	public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, int limit, List<T> out)
+	public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, int limit, Collection<T> out)
 			throws SQLException, InstantiationException, IllegalAccessException {
 		ResultSet rs = null;
 		try {

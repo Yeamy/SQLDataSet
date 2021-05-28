@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -103,7 +104,7 @@ public class DsFactory<T> {
 		return read(rs, list);
 	}
 
-	public void readArray(List<T> out, ResultSet rs, int limit)
+	public void readArray(Collection<T> out, ResultSet rs, int limit)
 			throws SQLException, InstantiationException, IllegalAccessException {
 		List<DsField> list = findColumnIndex(rs);
 		while (rs.next()) {
@@ -114,7 +115,7 @@ public class DsFactory<T> {
 		}
 	}
 
-	public void readArray(List<T> out, ResultSet rs)
+	public void readArray(Collection<T> out, ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
 		List<DsField> list = findColumnIndex(rs);
 		while (rs.next()) {
