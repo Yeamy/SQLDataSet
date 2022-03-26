@@ -124,7 +124,7 @@ public class DsReader {
 			while (rs.next()) {
 				list.add(rs.getInt(1));
 			}
-			return list.getArray();
+			return list.toArray();
 		} finally {
 			if (rs != null) {
 				try {
