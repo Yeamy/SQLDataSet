@@ -2,9 +2,9 @@ package com.yeamy.sql.ds;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -16,7 +16,6 @@ public class DsFactory<T> {
 	private HashMap<Class<?>, DsAdapter> map;
 	private List<DsField> fields;
 	private Class<T> clz;
-	private Calendar cal;
 
 	public DsFactory(Class<T> clz) {
 		this.clz = clz;
@@ -28,7 +27,7 @@ public class DsFactory<T> {
 			}
 			DsField f = DsField.get(field, this);
 			if (f != null) {
-				if (f.isBaseType()) {
+				if (f instanceof DsBaseField) {
 					list.addFirst(f);
 				} else {
 					list.addLast(f);
@@ -62,28 +61,30 @@ public class DsFactory<T> {
 		}
 	}
 
-	Calendar getCalendar() {
-		if (cal == null) {
-			cal = Calendar.getInstance();
+	List<DsColumnIndex> findColumnIndex(ResultSet rs) throws SQLException {
+		HashMap<String, Integer> colMap = new HashMap<>();
+		ResultSetMetaData md = rs.getMetaData();
+		for (int i = 1, c = md.getColumnCount(); i < c; i++) {
+			colMap.put(md.getColumnLabel(i).replace("_", "").toLowerCase(), i);
 		}
-		return cal;
+		return findColumnIndex(rs, colMap);
 	}
 
-	List<DsField> findColumnIndex(ResultSet rs) {
-		List<DsField> fields = new ArrayList<>();
+	List<DsColumnIndex> findColumnIndex(ResultSet rs, HashMap<String, Integer> colMap) {
+		List<DsColumnIndex> fields = new ArrayList<>();
 		for (DsField dsField : this.fields) {
-			if (dsField.findColumnIndex(rs)) {
-				fields.add(dsField);
+			DsColumnIndex i = dsField.findColumnIndex(rs, colMap);
+			if (i != null) {
+				fields.add(i);
 			}
 		}
 		return fields;
 	}
 
-	private T read(ResultSet rs, List<DsField> list)
-			throws SQLException, InstantiationException, IllegalAccessException {
+	T read(ResultSet rs, List<DsColumnIndex> list) throws SQLException, InstantiationException, IllegalAccessException {
 		T t = clz.newInstance();
-		for (DsField f : list) {
-			f.read(rs, t, this);
+		for (DsColumnIndex f : list) {
+			f.read(rs, t);
 		}
 		if (t instanceof DsObserver) {
 			((DsObserver) t).onDsFinish();
@@ -92,21 +93,16 @@ public class DsFactory<T> {
 	}
 
 	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		if (rs.next()) {
 			return read(rs, list);
 		}
 		return null;
 	}
 
-	public T readExtra(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
-		return read(rs, list);
-	}
-
 	public void readArray(Collection<T> out, ResultSet rs, int limit)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		while (rs.next()) {
 			if (limit-- <= 0) {
 				break;
@@ -117,7 +113,7 @@ public class DsFactory<T> {
 
 	public void readArray(Collection<T> out, ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		while (rs.next()) {
 			out.add(read(rs, list));
 		}
