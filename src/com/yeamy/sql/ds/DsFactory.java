@@ -64,7 +64,7 @@ public class DsFactory<T> {
 	List<DsColumnIndex> findColumnIndex(ResultSet rs) throws SQLException {
 		HashMap<String, Integer> colMap = new HashMap<>();
 		ResultSetMetaData md = rs.getMetaData();
-		for (int i = 1, c = md.getColumnCount(); i < c; i++) {
+		for (int i = 1, c = md.getColumnCount(); i <= c; i++) {
 			colMap.put(md.getColumnLabel(i).replace("_", "").toLowerCase(), i);
 		}
 		return findColumnIndex(rs, colMap);

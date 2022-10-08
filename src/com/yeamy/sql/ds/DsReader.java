@@ -9,7 +9,6 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.yeamy.utils.array.BooleanArray;
@@ -470,14 +469,14 @@ public class DsReader {
 		}
 	}
 
-	public static ArrayList<HashMap<String, Object>> readArray(Statement stmt, String sql)
+	public static ArrayList<Map<String, Object>> readArray(Statement stmt, String sql)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		try (ResultSet rs = stmt.executeQuery(sql)) {
 			return DsMapFactory.readArray(rs);
 		}
 	}
 
-	public static ArrayList<HashMap<String, Object>> readArray(Statement stmt, String sql, int limit)
+	public static ArrayList<Map<String, Object>> readArray(Statement stmt, String sql, int limit)
 			throws InstantiationException, IllegalAccessException, SQLException {
 		try (ResultSet rs = stmt.executeQuery(sql)) {
 			return DsMapFactory.readArray(rs, limit);
