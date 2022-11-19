@@ -1,4 +1,7 @@
-package com.yeamy.sql.ds;
+package yeamy.sql.ds;
+
+import yeamy.sql.DsIgnore;
+import yeamy.sql.DsObserver;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;

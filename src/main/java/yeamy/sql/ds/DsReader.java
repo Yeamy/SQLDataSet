@@ -1,22 +1,12 @@
-package com.yeamy.sql.ds;
+package yeamy.sql.ds;
+
+import yeamy.utils.array.*;
 
 import java.math.BigDecimal;
-import java.sql.Date;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-
-import com.yeamy.utils.array.BooleanArray;
-import com.yeamy.utils.array.ByteArray;
-import com.yeamy.utils.array.DoubleArray;
-import com.yeamy.utils.array.FloatArray;
-import com.yeamy.utils.array.IntArray;
-import com.yeamy.utils.array.LongArray;
 
 public class DsReader {
 

@@ -1,23 +1,23 @@
-package com.yeamy.utils.array;
+package yeamy.utils.array;
 
-public class BooleanArray {
+public class ByteArray {
 
 	private int size = 0;
-	private boolean[] array;
+	private byte[] array;
 
-	public BooleanArray() {
+	public ByteArray() {
 		this(16);
 	}
 
-	public BooleanArray(int size) {
-		array = new boolean[size];
+	public ByteArray(int size) {
+		array = new byte[size];
 	}
 
-	public void add(boolean n) {
-		boolean[] src = this.array;
+	public void add(byte n) {
+		byte[] src = this.array;
 		int index = size;
 		if (index == array.length) {
-			boolean[] dest = new boolean[array.length + 16];
+			byte[] dest = new byte[array.length + 16];
 			System.arraycopy(src, 0, dest, 0, index);
 			this.array = src = dest;
 		}
@@ -42,13 +42,13 @@ public class BooleanArray {
 	}
 
 	public void trimToSize() {
-		boolean[] dest = new boolean[size];
+		byte[] dest = new byte[size];
 		System.arraycopy(array, 0, dest, 0, size);
 		this.array = dest;
 	}
 
-	public boolean[] getArray() {
-		boolean[] dest = new boolean[size];
+	public byte[] getArray() {
+		byte[] dest = new byte[size];
 		System.arraycopy(array, 0, dest, 0, size);
 		return dest;
 	}

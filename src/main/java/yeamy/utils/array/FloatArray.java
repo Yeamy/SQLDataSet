@@ -1,4 +1,4 @@
-package com.yeamy.utils.array;
+package yeamy.utils.array;
 
 public class FloatArray {
 
