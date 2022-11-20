@@ -8,12 +8,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * The factory to generate java bean,
+ * add custom types' adapter to create fields value.
+ * You can cache the factory to avoid too much reflection.
+ */
 public class DsFactory<T> {
 
 	private HashMap<Class<?>, DsAdapter> map;
 	private final List<DsField> fields;
 	private final Class<T> type;
 
+	/**
+	 * @param type type to generate
+	 */
 	public DsFactory(Class<T> type) {
 		this.type = type;
 		LinkedList<DsField> list = new LinkedList<>();
@@ -34,6 +42,11 @@ public class DsFactory<T> {
 		this.fields = list;
 	}
 
+	/**
+	 * add a field type adapter
+	 * @param fieldType type of field
+	 * @param adapter adapter to read field
+	 */
 	public void addAdapter(Class<?> fieldType, DsAdapter adapter) {
 		if (map == null) {
 			map = new HashMap<>();
@@ -41,6 +54,11 @@ public class DsFactory<T> {
 		map.put(fieldType, adapter);
 	}
 
+	/**
+	 * get a field type adapter
+	 * @param fieldType type of field
+	 * @return  adapter to read field
+	 */
 	public DsAdapter getAdapter(Class<?> fieldType) {
 		if (map == null) {
 			return null;

@@ -27,7 +27,7 @@ public enum DsType {
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
 	Blob(java.sql.Blob.class), //
-	Extra(Object.class), //
+	Extra(Object.class), // custom type without DsColumn and DsIgnore
 	;
 
 	private final Class<?> type;
