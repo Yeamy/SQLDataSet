@@ -1,23 +1,23 @@
 package yeamy.utils.array;
 
-public class DoubleArray {
+public class ShortArray {
 
 	private int length = 0;
-	private double[] array;
+	private short[] array;
 
-	public DoubleArray() {
+	public ShortArray() {
 		this(16);
 	}
 
-	public DoubleArray(int length) {
-		array = new double[length];
+	public ShortArray(int length) {
+		array = new short[length];
 	}
 
-	public void add(double n) {
-		double[] src = this.array;
+	public void add(short n) {
+		short[] src = this.array;
 		int index = length;
 		if (index == array.length) {
-			double[] dest = new double[array.length + 16];
+			short[] dest = new short[array.length + 16];
 			System.arraycopy(src, 0, dest, 0, index);
 			this.array = src = dest;
 		}
@@ -42,27 +42,27 @@ public class DoubleArray {
 	}
 
 	public void trimToSize() {
-		double[] dest = new double[length];
+		short[] dest = new short[length];
 		System.arraycopy(array, 0, dest, 0, length);
 		this.array = dest;
 	}
 
-    public double get(int index) {
+    public short get(int index) {
         if (index >= length) {
             throw new ArrayIndexOutOfBoundsException("Index " + index + " out of bounds for length " + length);
         }
         return array[index];
     }
 
-    public void set(int index, double data) {
+    public void set(int index, short data) {
         if (index >= length) {
             throw new ArrayIndexOutOfBoundsException("Index " + index + " out of bounds for length " + length);
         }
         array[index] = data;
     }
 
-	public double[] getArray() {
-		double[] dest = new double[length];
+	public short[] getArray() {
+		short[] dest = new short[length];
 		System.arraycopy(array, 0, dest, 0, length);
 		return dest;
 	}
