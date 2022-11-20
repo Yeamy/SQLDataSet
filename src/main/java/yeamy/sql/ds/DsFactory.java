@@ -5,32 +5,26 @@ import yeamy.sql.DsObserver;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class DsFactory<T> {
-	public static boolean DEBUG = false;
 
 	private HashMap<Class<?>, DsAdapter> map;
-	private List<DsField> fields;
-	private Class<T> clz;
+	private final List<DsField> fields;
+	private final Class<T> type;
 
-	public DsFactory(Class<T> clz) {
-		this.clz = clz;
+	public DsFactory(Class<T> type) {
+		this.type = type;
 		LinkedList<DsField> list = new LinkedList<>();
-		Field[] fields = clz.getFields();
+		Field[] fields = type.getFields();
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(DsIgnore.class)) {
 				continue;
 			}
 			DsField f = DsField.get(field, this);
 			if (f != null) {
-				if (f instanceof DsBaseField) {
+				if (f.isBaseType()) {
 					list.addFirst(f);
 				} else {
 					list.addLast(f);
@@ -40,53 +34,43 @@ public class DsFactory<T> {
 		this.fields = list;
 	}
 
-	public void addAdapter(Class<?> clz, DsAdapter adapter) {
+	public void addAdapter(Class<?> fieldType, DsAdapter adapter) {
 		if (map == null) {
 			map = new HashMap<>();
 		}
-		map.put(clz, adapter);
+		map.put(fieldType, adapter);
 	}
 
-	public DsAdapter getAdapter(Class<?> clz) {
+	public DsAdapter getAdapter(Class<?> fieldType) {
 		if (map == null) {
 			return null;
 		}
 		while (true) {
-			if (clz == null) {
+			if (fieldType == null) {
 				return null;
 			}
-			DsAdapter adapter = map.get(clz);
+			DsAdapter adapter = map.get(fieldType);
 			if (adapter == null) {
-				clz = clz.getSuperclass();
+				fieldType = fieldType.getSuperclass();
 			} else {
 				return adapter;
 			}
 		}
 	}
 
-	List<DsColumnIndex> findColumnIndex(ResultSet rs) throws SQLException {
-		HashMap<String, Integer> colMap = new HashMap<>();
-		ResultSetMetaData md = rs.getMetaData();
-		for (int i = 1, c = md.getColumnCount(); i <= c; i++) {
-			colMap.put(md.getColumnLabel(i).replace("_", "").toLowerCase(), i);
-		}
-		return findColumnIndex(rs, colMap);
-	}
-
-	List<DsColumnIndex> findColumnIndex(ResultSet rs, HashMap<String, Integer> colMap) {
-		List<DsColumnIndex> fields = new ArrayList<>();
+	List<DsField> findColumnIndex(ResultSet rs) {
+		List<DsField> fields = new ArrayList<>();
 		for (DsField dsField : this.fields) {
-			DsColumnIndex i = dsField.findColumnIndex(rs, colMap);
-			if (i != null) {
-				fields.add(i);
+			if (dsField.findColumnIndex(rs)) {
+				fields.add(dsField);
 			}
 		}
 		return fields;
 	}
 
-	T read(ResultSet rs, List<DsColumnIndex> list) throws SQLException, InstantiationException, IllegalAccessException {
-		T t = clz.newInstance();
-		for (DsColumnIndex f : list) {
+	T read(ResultSet rs, List<DsField> list) throws SQLException, InstantiationException, IllegalAccessException {
+		T t = type.newInstance();
+		for (DsField f : list) {
 			f.read(rs, t);
 		}
 		if (t instanceof DsObserver) {
@@ -96,7 +80,7 @@ public class DsFactory<T> {
 	}
 
 	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsColumnIndex> list = findColumnIndex(rs);
+		List<DsField> list = findColumnIndex(rs);
 		if (rs.next()) {
 			return read(rs, list);
 		}
@@ -105,7 +89,7 @@ public class DsFactory<T> {
 
 	public void readArray(Collection<T> out, ResultSet rs, int limit)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsColumnIndex> list = findColumnIndex(rs);
+		List<DsField> list = findColumnIndex(rs);
 		while (rs.next()) {
 			if (limit-- <= 0) {
 				break;
@@ -114,9 +98,9 @@ public class DsFactory<T> {
 		}
 	}
 
-	public void readArray(Collection<T> out, ResultSet rs)
+	public void readArray(Collection<T> out,  ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsColumnIndex> list = findColumnIndex(rs);
+		List<DsField> list = findColumnIndex(rs);
 		while (rs.next()) {
 			out.add(read(rs, list));
 		}

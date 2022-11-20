@@ -2,6 +2,9 @@ package yeamy.sql.ds;
 
 import java.lang.reflect.Field;
 
+/**
+ * All support base type
+ */
 public enum DsType {
 	_int(int.class), //
 	_long(long.class), //
@@ -23,10 +26,11 @@ public enum DsType {
 	Time(java.sql.Time.class), //
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
+	Blob(java.sql.Blob.class), //
 	Extra(Object.class), //
 	;
 
-	private Class<?> type;
+	private final Class<?> type;
 
 	DsType(Class<?> type) {
 		this.type = type;
