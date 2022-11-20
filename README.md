@@ -2,7 +2,7 @@ SQLDataSet
 ===================================
 English | [中文](README-CN.md)
 
-This project is a simple tools to deserialize Java Bean from JDBC ResultSet.
+A simple orm, deserialize data from `JDBC ResultSet` as java bean.
 
 For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
