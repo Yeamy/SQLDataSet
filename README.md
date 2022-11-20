@@ -1,8 +1,8 @@
-SQL Data Set
+SQLDataSet
 ===================================
 English | [中文](README-CN.md)
 
-This project is a simple tools to unSerialize Java Bean from JDBC ResultSet.
+This project is a simple tools to deserialize Java Bean from JDBC ResultSet.
 
 For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
@@ -12,19 +12,21 @@ public class Fruit {
 
     @DsColumn("Name")
     public String name;      // the column in database is "Name"
-    
+
+    public String fullName;  // the column in database can be "fullName" or "full_name"
+
     @DsIgnore
     public String count;     // ignore this field
-    
+
     public FruitType type;   // the name of the column is the same as the field
-                             // regist as custom type (see DsAdapter)
+    // regist as custom type (see DsAdapter)
 
     public Skin skin;        // this field no DsColumn treat as extra type
 }
 ```
 
 ### 2. DsReader
-Generally, using `DsReader` is a easy and fast way.
+Generally, using `DsReader` is an easy and fast way.
 
 ```java
 Statement stmt = ...;                                 // the source
@@ -34,9 +36,7 @@ ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
 ```
 
 ### 3. DsFactory\<T> & DsAdapter
-The `DsFactory` support base type in sql, such as int, long, String, URL, time. 
-
-Using `DsAdapter` to unserialize custom field.
+In order to deserialize custom field type, you may define a `DsFactory` and register a type with `DsAdapter`.
 
 ```java
 java.sql.ResultSet rs = ...;                           // the data source
@@ -47,7 +47,7 @@ DsAdapter adapter = new DsAdapter() {
 
     /**
      * @param t
-     *           any other base type field has been unserialized
+     *           any other base type field has been deserialized
      * @param field
      *           using field.getName() to distinguish same type.
      * @param rs
@@ -73,7 +73,7 @@ factory.readArray(list, rs);                           // read array with custom
 ```
 
 ### 4. DsObserver
-If you want to do anything when the Bean has been readed, you can implements `DsObserver.class`, and do it in `onDsFinish()`.
+If you want to do anything after the Bean read, you can implement `DsObserver.class`, and do it in `onDsFinish()`.
 
 ```java
 public class Vegetables implements DsObserver {
@@ -88,7 +88,7 @@ public class Vegetables implements DsObserver {
 ```
 
 ### 5. Extra Field
-Data come from same row of ResultSet can unserialize into a extra field.
+Data come from same row of ResultSet can deserialize into an extra field.
 
 source table:
 
@@ -97,7 +97,7 @@ source table:
 |Nike|Guangdong|Shantou|...|
 |...|
 
-Usually, unserialize like this:
+Usually, deserialize like this:
 
 ```java
 public class User {

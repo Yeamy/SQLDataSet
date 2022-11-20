@@ -1,4 +1,4 @@
-SQL Data Set
+SQLDataSet
 ===================================
 [English](README.md) | 中文
 
@@ -12,7 +12,9 @@ public class Fruit {
 
     @DsColumn("Name")
     public String name;      // 声明此参数对应列名为Name
-    
+
+    public String fullName;  // 列名可以是 "fullName" 或者 "full_name"
+
     @DsIgnore
     public String count;     // 声明此参数不读取
     
@@ -24,7 +26,7 @@ public class Fruit {
 ```
 
 ### 2. DsReader
-一般情况使用DsReader工具类快速读取
+一般情况使用DsReader工具类快速读取已足矣
 
 ```java
 Statement stmt = ...;                                 // 数据源
@@ -34,7 +36,7 @@ ArrayList<Fruit> list = r DsReader.readArray(stmt, sql, Fruit.class);
 ```
 
 ### 3. DsFactory\<T> 和 DsAdapter
-使用自定义工厂类生产对象，添加DsAdapter来扩展自定义类型。
+使用自定义工厂类生产对象，并注册DsAdapter来扩展自定义类型。
 
 ```java
 java.sql.ResultSet rs = ...;                           // 数据来源
