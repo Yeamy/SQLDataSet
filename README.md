@@ -6,8 +6,11 @@ A simple orm, deserialize data from `JDBC ResultSet` as java bean.
 
 For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
+```groovy
+    implementation 'io.github.yeamy:sqldataset:1.0'
+```
 ### 1. Annotation
-```java
+``````
 public class Fruit {
 
     @DsColumn("Name")
@@ -28,7 +31,7 @@ public class Fruit {
 ### 2. DsReader
 Generally, using `DsReader` is an easy and fast way.
 
-```java
+```
 Statement stmt = ...;                                 // the source
 String sql = "SELECT ...";                            // the sql
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);  // read one
@@ -38,7 +41,7 @@ ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
 ### 3. DsFactory\<T> & DsAdapter
 In order to deserialize custom field type, you may define a `DsFactory` and register a type with `DsAdapter`.
 
-```java
+```
 java.sql.ResultSet rs = ...;                           // the data source
 
 DsFactory<Fruit> factory = new DsFactory(Fruit.class); // build a factory
@@ -75,7 +78,7 @@ factory.readArray(list, rs);                           // read array with custom
 ### 4. DsObserver
 If you want to do anything after the Bean read, you can implement `DsObserver.class`, and do it in `onDsFinish()`.
 
-```java
+```
 public class Vegetables implements DsObserver {
 
     @DsColumn("Name")
@@ -99,7 +102,7 @@ source table:
 
 Usually, deserialize like this:
 
-```java
+```
 public class User {
 
     @DsColumn("UserName")
@@ -117,15 +120,14 @@ public class User {
 
 to package `province` and `city` into same field `location`, see below:
 
-```java
+```
 public class User {
 
     @DsColumn("UserName")
     public String name;
     ...
 
-    // NOTICE：must without annotion DsColumn, field name cannot as same sa column,
-    // otherwise using DsAdapter instead
+    // NOTICE：must not declare annotation with DsColumn nor DsIgnore.
     public City location;
 }
 

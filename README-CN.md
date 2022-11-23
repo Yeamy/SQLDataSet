@@ -6,8 +6,11 @@ SQLDataSet
 
 Android平台SQLite可以看这里[SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
+```groovy
+    implementation 'io.github.yeamy:sqldataset:1.0'
+```
 ### 1. Bean类声明
-```java
+```
 public class Fruit {
 
     @DsColumn("Name")
@@ -28,7 +31,7 @@ public class Fruit {
 ### 2. DsReader
 一般情况使用DsReader工具类快速读取已足矣
 
-```java
+```
 Statement stmt = ...;                                 // 数据源
 String sql = "SELECT ...";                            // 筛选的SQL语句
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);
@@ -38,7 +41,7 @@ ArrayList<Fruit> list = r DsReader.readArray(stmt, sql, Fruit.class);
 ### 3. DsFactory\<T> 和 DsAdapter
 使用自定义工厂类生产对象，并注册DsAdapter来扩展自定义类型。
 
-```java
+```
 java.sql.ResultSet rs = ...;                           // 数据来源
 
 DsFactory<Fruit> factory = new DsFactory(Fruit.class); // 实例化工厂
@@ -76,7 +79,7 @@ factory.readArray(list, rs);                           // 自定义list
 ### 4. DsObserver
 如果导入DsObserver接口，解析结束后会调用onDsFinish()方法，可以在此方法修改数据。
 
-```java
+```
 public class Vegetables implements DsObserver {
 
     @DsColumn("Name")
@@ -100,7 +103,7 @@ public class Vegetables implements DsObserver {
 
 通常会采用如下数据类：
 
-```java
+```
 public class User {
     @DsColumn("UserName")
     public String name;
@@ -117,7 +120,7 @@ public class User {
 
 为了将province和city封装到同个参数内，可以使用如下方式：
 
-```java
+```
 public class User {
     @DsColumn("UserName")
     public String name;
@@ -136,4 +139,5 @@ public class City {
     ...
 }
 
+```
 ```
