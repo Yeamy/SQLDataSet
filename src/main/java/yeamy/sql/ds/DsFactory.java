@@ -33,21 +33,15 @@ public class DsFactory<T> {
 			constructor = null;
 		}
 		this.constructor = constructor;
-		LinkedList<DsField> list = new LinkedList<>();
+        ArrayList<DsField> list = new ArrayList<>();
 		Field[] fields = type.getFields();
 		for (Field field : fields) {
 			if (field.isAnnotationPresent(DsIgnore.class)) {
 				continue;
 			}
-			DsField f = DsField.get(field, this);
-			if (f != null) {
-				if (f.isBaseType()) {
-					list.addFirst(f);
-				} else {
-					list.addLast(f);
-				}
-			}
+            list.add(DsField.get(field, this));
 		}
+        Collections.sort(list);
 		this.fields = list;
 	}
 
@@ -85,22 +79,23 @@ public class DsFactory<T> {
 		}
 	}
 
-	List<DsField> findColumnIndex(ResultSet rs) {
-		List<DsField> fields = new ArrayList<>();
+	List<DsColumnIndex> findColumnIndex(ResultSet rs) {
+		List<DsColumnIndex> fields = new ArrayList<>();
 		for (DsField dsField : this.fields) {
-			if (dsField.findColumnIndex(rs)) {
-				fields.add(dsField);
-			}
+            DsColumnIndex i = dsField.findColumnIndex(rs);
+            if (i != null) {
+                fields.add(i);
+            }
 		}
 		return fields;
 	}
 
 	@SuppressWarnings("deprecation")
-	T read(ResultSet rs, List<DsField> list) throws SQLException, InstantiationException, IllegalAccessException {
+    T read(ResultSet rs, List<DsColumnIndex> list) throws SQLException, InstantiationException, IllegalAccessException {
 		T t = null;
 		if (constructor != null) {
 			try {
-				t = type.getDeclaredConstructor().newInstance();
+				t = constructor.newInstance();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -113,8 +108,8 @@ public class DsFactory<T> {
 				return null;
 			}
 		}
-		for (DsField f : list) {
-			f.read(rs, t);
+		for (DsColumnIndex i : list) {
+			i.read(rs, t);
 		}
 		if (t instanceof DsObserver) {
 			((DsObserver) t).onDsFinish();
@@ -123,7 +118,7 @@ public class DsFactory<T> {
 	}
 
 	public T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		if (rs.next()) {
 			return read(rs, list);
 		}
@@ -132,7 +127,7 @@ public class DsFactory<T> {
 
 	public void readArray(Collection<T> out, ResultSet rs, int limit)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		while (rs.next()) {
 			if (limit-- <= 0) {
 				break;
@@ -143,7 +138,7 @@ public class DsFactory<T> {
 
 	public void readArray(Collection<T> out,  ResultSet rs)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		List<DsField> list = findColumnIndex(rs);
+		List<DsColumnIndex> list = findColumnIndex(rs);
 		while (rs.next()) {
 			out.add(read(rs, list));
 		}
