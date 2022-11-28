@@ -7,7 +7,7 @@ SQLDataSet
 Android平台SQLite可以看这里[SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
 ```groovy
-    implementation 'io.github.yeamy:sqldataset:1.0'
+    implementation 'io.github.yeamy:sqldataset:1.1'
 ```
 ### 1. Bean类声明
 ```

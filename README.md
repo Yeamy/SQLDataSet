@@ -7,7 +7,7 @@ A simple orm, deserialize data from `JDBC ResultSet` as java bean.
 For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
 ```groovy
-    implementation 'io.github.yeamy:sqldataset:1.0'
+    implementation 'io.github.yeamy:sqldataset:1.1'
 ```
 ### 1. Annotation
 ``````
