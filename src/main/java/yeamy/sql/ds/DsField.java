@@ -9,14 +9,11 @@ interface DsField extends Comparable<DsField> {
 
     DsColumnIndex findColumnIndex(ResultSet rs);
 
-    static DsField get(Field field, DsFactory<?> factory) {
+    static DsField get(Field field) {
         DsType dsType = DsType.getDsType(field);
         if (dsType == DsType.Extra) {// extra type
             Class<?> type = field.getType();
-            DsAdapter adapter = factory.getAdapter(type);
-            if (adapter != null) {// adapter
-                return new DsAdapterField(field, adapter);
-            } else if (field.isAnnotationPresent(DsColumn.class)) {// cannot read
+            if (field.isAnnotationPresent(DsColumn.class)) {// cannot read
                 return null;
             } else {
                 return new DsExtendField(field, type);

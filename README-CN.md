@@ -31,48 +31,22 @@ public class Fruit {
 ### 2. DsReader
 一般情况使用DsReader工具类快速读取已足矣
 
-```
+```java
 Statement stmt = ...;                                 // 数据源
 String sql = "SELECT ...";                            // 筛选的SQL语句
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);
-ArrayList<Fruit> list = r DsReader.readArray(stmt, sql, Fruit.class);
+ArrayList<Fruit> list = DsReader.readArray(stmt, sql, Fruit.class);
 ```
 
-### 3. DsFactory\<T> 和 DsAdapter
-使用自定义工厂类生产对象，并注册DsAdapter来扩展自定义类型。
+### 3. DsFactory\<T>
+使用自定义工厂类生产对象。
 
-```
-java.sql.ResultSet rs = ...;                           // 数据来源
-
-DsFactory<Fruit> factory = new DsFactory(Fruit.class); // 实例化工厂
-
-DsAdapter adapter = new DsAdapter() {
-
-    /**
-     * @param t
-     *           基础类型的成员变量已读取，可以直接使用
-     * @param field
-     *           对应需要读取的参数，使用field.getName()区分
-     * @param rs
-     *           数据库搜索结果
-     * @param columnIndex
-     *           对应参数在rs中对应的位置
-     */
-    @Override
-    public void read(Object t, Field field, ResultSet rs, int columnIndex) throws SQLException, InstantiationException, IllegalAccessException {
-        FruitType type = new FruitType(....);
-        field.set(t, type);
-    }
+```java
+DsFactory<Fruit> factory = new DsFactory<>() {
+    ...
 };
 
-factory.addAdapter(Type.class, adapter);               // 添加自定义类型
-
-Fruit apple = factory.read(rs);                        // 读取单个
-
-factory.readArray(list, rs);                           // 读取多个
-
-List<Fruit> list = new ArrayList<Fruit>();
-factory.readArray(list, rs);                           // 自定义list
+Fruit fruit = DsReader.read(stmt, sql, factory);
 ```
 
 
@@ -138,6 +112,3 @@ public class City {
     public String city;
     ...
 }
-
-```
-```

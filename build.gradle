@@ -3,13 +3,11 @@ plugins {
 }
 
 group 'io.github.yeamy'
-version '1.1'
+version '1.2'
 
 repositories {
     mavenCentral()
 }
-
-sourceCompatibility = JavaVersion.VERSION_1_8
 
 dependencies {
 //    testImplementation 'mysql:mysql-connector-java:8.0.32'
@@ -27,7 +25,7 @@ jar {// package code
     archiveFileName = 'lib.jar'
 //    archiveFileName = 'sqldataset_' + version +'.jar'
 }
-task generateSourceJar(type: Jar) {
+tasks.register('generateSourceJar', Jar) {
     archiveClassifier.set('sources')
     from sourceSets.main.java.srcDirs
     archiveFileName = 'lib-sources.jar'
@@ -43,7 +41,7 @@ javadoc {// create document
         links "http://docs.oracle.com/javase/8/docs/api"
     }
 }
-task generateJavadoc(type: Jar) { // package document as jar
+tasks.register('generateJavadoc', Jar) { // package document as jar
     group = 'jar'
     archiveFileName = 'lib-javadoc.jar'
 //    archiveFileName = 'sqldataset-' + version + '-javadoc.jar'

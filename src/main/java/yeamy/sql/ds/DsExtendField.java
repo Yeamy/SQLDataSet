@@ -6,11 +6,11 @@ import java.util.List;
 
 class DsExtendField implements DsField {
     private final Field field;
-    private final DsFactory<?> factory;
+    private final InternalDsFactory<?> factory;
 
     DsExtendField(Field field, Class<?> clz) {
         this.field = field;
-        this.factory = new DsFactory<>(clz);
+        this.factory = new InternalDsFactory<>(clz);
     }
 
     @Override

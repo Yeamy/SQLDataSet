@@ -35,44 +35,18 @@ Generally, using `DsReader` is an easy and fast way.
 Statement stmt = ...;                                 // the source
 String sql = "SELECT ...";                            // the sql
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);  // read one
-ArrayList<Fruit> list = r DsReader.eadArray(stmt, sql, Fruit.class);
+ArrayList<Fruit> list = DsReader.eadArray(stmt, sql, Fruit.class);
 ```
 
 ### 3. DsFactory\<T> & DsAdapter
-In order to deserialize custom field type, you may define a `DsFactory` and register a type with `DsAdapter`.
+In order to deserialize custom type, you may define a `DsFactory`.
 
-```
-java.sql.ResultSet rs = ...;                           // the data source
-
-DsFactory<Fruit> factory = new DsFactory(Fruit.class); // build a factory
-
-DsAdapter adapter = new DsAdapter() {
-
-    /**
-     * @param t
-     *           any other base type field has been deserialized
-     * @param field
-     *           using field.getName() to distinguish same type.
-     * @param rs
-     *           jdbc select result,
-     * @param columnIndex
-     *           the index of the target column in ResultSet.
-     */
-    @Override
-    public void read(Object t, Field field, ResultSet rs, int columnIndex) throws SQLException, InstantiationException, IllegalAccessException {
-        FruitType type = new FruitType(....);
-        field.set(t, type);
-    }
+```java
+DsFactory<Fruit> factory = new DsFactory<>() {
+    //...
 };
 
-factory.addAdapter(Type.class, adapter);               // add custom type
-
-Fruit apple = factory.read(rs);                        // read one
-
-factory.readArray(list, rs);                           // read array
-
-List<Fruit> list = new ArrayList<Fruit>();
-factory.readArray(list, rs);                           // read array with custom list
+Fruit fruit = DsReader.read(stmt, sql, factory);
 ```
 
 ### 4. DsObserver
