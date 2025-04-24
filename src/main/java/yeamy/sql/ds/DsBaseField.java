@@ -17,7 +17,7 @@ class DsBaseField implements DsField {
 
     @Override
     public int compareTo(DsField o) {
-        return 1;
+        return o instanceof DsBaseField ? 0 : -1;
     }
 
     @Override

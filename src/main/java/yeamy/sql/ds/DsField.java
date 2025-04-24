@@ -18,6 +18,8 @@ interface DsField extends Comparable<DsField> {
             } else {
                 return new DsExtendField(field, type);
             }
+        } else if (dsType == DsType.Enum) {
+            return new DsEnumField(field);
         } else {// base type
             return new DsBaseField(field, dsType);
         }

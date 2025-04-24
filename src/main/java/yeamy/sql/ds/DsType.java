@@ -27,6 +27,7 @@ public enum DsType {
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
 	Blob(java.sql.Blob.class), //
+	Enum(java.lang.Enum.class),
 	Extra(Object.class), // custom type without DsColumn and DsIgnore
 	;
 
@@ -40,7 +41,7 @@ public enum DsType {
 		DsType[] types = DsType.values();
 		Class<?> src = field.getType();
 		for (DsType type : types) {
-			if (src.isAssignableFrom(type.type)) {
+			if (type.type.isAssignableFrom(src)) {
 				return type;
 			}
 		}

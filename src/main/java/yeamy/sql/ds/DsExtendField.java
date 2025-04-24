@@ -15,7 +15,7 @@ class DsExtendField implements DsField {
 
     @Override
     public int compareTo(DsField o) {
-        return 2;
+        return o instanceof DsExtendField ? 0 : 1;
     }
 
     @Override
