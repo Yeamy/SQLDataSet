@@ -1805,7 +1805,7 @@ public class DsReader {
      */
     public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> type, int limit)
             throws InstantiationException, IllegalAccessException, SQLException {
-        ArrayList<T> out = new ArrayList<>();
+        ArrayList<T> out = new ArrayList<>(limit);
         readArray(stmt, sql, new InternalDsFactory<>(type), limit, out);
         return out;
     }
@@ -1820,7 +1820,7 @@ public class DsReader {
      */
     public static <T> ArrayList<T> readArray(PreparedStatement stmt, Class<T> type, int limit)
             throws InstantiationException, IllegalAccessException, SQLException {
-        ArrayList<T> out = new ArrayList<>();
+        ArrayList<T> out = new ArrayList<>(limit);
         readArray(stmt, new InternalDsFactory<>(type), limit, out);
         return out;
     }
