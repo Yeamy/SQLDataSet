@@ -1,4 +1,4 @@
-package yeamy.sql;
+package yeamy.sql.ds;
 
 import static java.lang.annotation.ElementType.FIELD;
 
@@ -7,10 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation this field is not a column and it will be skip while reading.
- * @see DsColumn
+ * Annotation the column name of the field.
+ * Normally, you don't need to annotation this
+ * unless the column name is not the same with the field.
+ * @see DsIgnore
  */
 @Target({ FIELD })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DsIgnore {
+public @interface DsColumn {
+	String value();
 }

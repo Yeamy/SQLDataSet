@@ -1,27 +1,31 @@
 package yeamy.sql.ds;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
 
-class DsBaseField extends DsField {
+class DsBaseField9 extends DsField {
     private static final Calendar calendar = Calendar.getInstance();
     private final DsType dsType;
+    private final VarHandle vh;
 
-    public static DsField create(Field field, DsType dsType, ResultSet rs) {
+    public static DsField create(Class<?> type, Field field, DsType dsType, ResultSet rs) throws ReflectiveOperationException {
         int columnIndex = findColumnIndex(field, rs);
-        return columnIndex == -1 ? null : new DsBaseField(field, columnIndex, dsType);
+        return columnIndex == -1 ? null : new DsBaseField9(type, field, columnIndex, dsType);
     }
 
-    DsBaseField(Field field, int columnIndex, DsType dsType) {
+    DsBaseField9(Class<?> type, Field field, int columnIndex, DsType dsType) throws ReflectiveOperationException {
         super(field, columnIndex);
         this.dsType = dsType;
+        this.vh = MethodHandles.lookup().findVarHandle(field.getType(), field.getName(), type);
     }
 
     @Override
     public int compareTo(DsField o) {
-        return o instanceof DsBaseField ? 0 : -1;
+        return o instanceof DsBaseField9 ? 0 : -1;
     }
 
     @Override
@@ -29,52 +33,52 @@ class DsBaseField extends DsField {
         switch (dsType) {
             case _boolean:
             case Boolean:
-                field.setBoolean(t, rs.getBoolean(columnIndex));
+                vh.set(rs.getBoolean(columnIndex));
                 break;
             case _byte:
             case Byte:
-                field.setByte(t, rs.getByte(columnIndex));
+                vh.set(rs.getByte(columnIndex));
                 break;
             case _short:
             case Short:
-                field.setShort(t, rs.getShort(columnIndex));
+                vh.set(rs.getShort(columnIndex));
                 break;
             case _int:
             case Integer:
-                field.setInt(t, rs.getInt(columnIndex));
+                vh.set(rs.getInt(columnIndex));
                 break;
             case _long:
             case Long:
-                field.setLong(t, rs.getLong(columnIndex));
+                vh.set(rs.getLong(columnIndex));
                 break;
             case _float:
             case Float:
-                field.setFloat(t, rs.getFloat(columnIndex));
+                vh.set(rs.getFloat(columnIndex));
                 break;
             case _double:
             case Double:
-                field.setDouble(t, rs.getDouble(columnIndex));
+                vh.set(rs.getDouble(columnIndex));
                 break;
             case BigDecimal:
-                field.set(t, rs.getBigDecimal(columnIndex));
+                vh.set(rs.getBigDecimal(columnIndex));
                 break;
             case String:
-                field.set(t, rs.getString(columnIndex));
+                vh.set(rs.getString(columnIndex));
                 break;
             case Date:
-                field.set(t, rs.getDate(columnIndex, calendar));
+                vh.set(rs.getDate(columnIndex, calendar));
                 break;
             case Time:
-                field.set(t, rs.getTime(columnIndex, calendar));
+                vh.set(rs.getTime(columnIndex, calendar));
                 break;
             case Timestamp:
-                field.set(t, rs.getTimestamp(columnIndex, calendar));
+                vh.set(rs.getTimestamp(columnIndex, calendar));
                 break;
             case URL:
-                field.set(t, rs.getURL(columnIndex));
+                vh.set(rs.getURL(columnIndex));
                 break;
             case Blob:
-                field.set(t, rs.getBlob(columnIndex));
+                vh.set(rs.getBlob(columnIndex));
                 break;
             default:
         }

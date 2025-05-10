@@ -11,10 +11,10 @@ import java.util.Collection;
  */
 public interface DsFactory<T> {
 
-    T read(ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException;
+    T read(ResultSet rs) throws SQLException, ReflectiveOperationException;
 
-    void readArray(Collection<T> out, ResultSet rs, int limit) throws SQLException, InstantiationException, IllegalAccessException;
+    void readArray(Collection<T> out, ResultSet rs, int limit) throws SQLException, ReflectiveOperationException;
 
-    void readArray(Collection<T> out, ResultSet rs) throws SQLException, InstantiationException, IllegalAccessException;
+    void readArray(Collection<T> out, ResultSet rs) throws SQLException, ReflectiveOperationException;
 
 }

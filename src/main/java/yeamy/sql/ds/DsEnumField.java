@@ -1,18 +1,21 @@
 package yeamy.sql.ds;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DsEnumField implements DsField {
-    private final Field field;
+class DsEnumField extends DsField {
     private final Class<?> type;
     private final Method method;
 
-    DsEnumField(Field field) {
-        this.field = field;
+    public static DsField create(Field field, ResultSet rs) {
+        int columnIndex = findColumnIndex(field, rs);
+        return columnIndex == -1 ? null : new DsEnumField(field, columnIndex);
+    }
+
+    DsEnumField(Field field, int columnIndex) {
+        super(field, columnIndex);
         this.type = field.getType();
         Method method;
         try {
@@ -31,17 +34,9 @@ class DsEnumField implements DsField {
     }
 
     @Override
-    public DsColumnIndex findColumnIndex(ResultSet rs) {
-        int index = DsField.findColumnIndex(field, rs);
-        return index == -1 ? null : (r, t) -> read(r, t, index);
-    }
-
-    private void read(ResultSet rs, Object t, int columnIndex) throws SQLException, IllegalAccessException {
-        try {
-            String data = rs.getString(columnIndex);
-            Object obj = method.invoke(type, data);
-            field.set(t, obj);
-        } catch (IllegalArgumentException | InvocationTargetException e) {
-        }
+    public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
+        String data = rs.getString(columnIndex);
+        Object obj = method.invoke(type, data);
+        field.set(t, obj);
     }
 }

@@ -1695,7 +1695,7 @@ public class DsReader {
      * @return the row data as object, null if no result
      */
     public static <T> T read(Statement stmt, String sql, Class<T> type)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         return read(stmt, sql, new InternalDsFactory<>(type));
     }
 
@@ -1707,7 +1707,7 @@ public class DsReader {
      * @return the row data as object, null if no result
      */
     public static <T> T read(PreparedStatement stmt, Class<T> type)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         return read(stmt, new InternalDsFactory<>(type));
     }
 
@@ -1720,7 +1720,7 @@ public class DsReader {
      * @return the row data as object or return fallback if no result
      */
     public static <T> T read(Statement stmt, String sql, DsFactory<T> factory)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             return factory.read(rs);
         }
@@ -1734,7 +1734,7 @@ public class DsReader {
      * @return the row data as object or return fallback if no result
      */
     public static <T> T read(PreparedStatement stmt, DsFactory<T> factory)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
             return factory.read(rs);
         }
@@ -1749,7 +1749,7 @@ public class DsReader {
      * @return rows data as object in a list, empty if no result
      */
     public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> type)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>();
         readArray(stmt, sql, new InternalDsFactory<>(type), out);
         return out;
@@ -1763,7 +1763,7 @@ public class DsReader {
      * @return rows data as object in a list, empty if no result
      */
     public static <T> ArrayList<T> readArray(PreparedStatement stmt, Class<T> type)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>();
         readArray(stmt, new InternalDsFactory<>(type), out);
         return out;
@@ -1778,7 +1778,7 @@ public class DsReader {
      * @param out  list to accept data
      */
     public static <T> void readArray(Statement stmt, String sql, Class<T> type, Collection<T> out)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         readArray(stmt, sql, new InternalDsFactory<>(type), out);
     }
 
@@ -1790,7 +1790,7 @@ public class DsReader {
      * @param out  list to accept data
      */
     public static <T> void readArray(PreparedStatement stmt, Class<T> type, Collection<T> out)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         readArray(stmt, new InternalDsFactory<>(type), out);
     }
 
@@ -1804,7 +1804,7 @@ public class DsReader {
      * @return rows data as object in a list, empty if no result
      */
     public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> type, int limit)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>(limit);
         readArray(stmt, sql, new InternalDsFactory<>(type), limit, out);
         return out;
@@ -1819,7 +1819,7 @@ public class DsReader {
      * @return rows data as object in a list, empty if no result
      */
     public static <T> ArrayList<T> readArray(PreparedStatement stmt, Class<T> type, int limit)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>(limit);
         readArray(stmt, new InternalDsFactory<>(type), limit, out);
         return out;
@@ -1834,7 +1834,7 @@ public class DsReader {
      * @param limit limit how many rows to read
      */
     public static <T> void readArray(Statement stmt, String sql, Class<T> type, Collection<T> out, int limit)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         readArray(stmt, sql, new InternalDsFactory<>(type), limit, out);
     }
 
@@ -1846,7 +1846,7 @@ public class DsReader {
      * @param limit limit how many rows to read
      */
     public static <T> void readArray(PreparedStatement stmt, Class<T> type, Collection<T> out, int limit)
-            throws InstantiationException, IllegalAccessException, SQLException {
+            throws ReflectiveOperationException, SQLException {
         readArray(stmt, new InternalDsFactory<>(type), limit, out);
     }
 
@@ -1859,7 +1859,7 @@ public class DsReader {
      * @param out     collection to accept data
      */
     public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, Collection<T> out)
-            throws SQLException, InstantiationException, IllegalAccessException {
+            throws SQLException, ReflectiveOperationException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             factory.readArray(out, rs);
         }
@@ -1873,7 +1873,7 @@ public class DsReader {
      * @param out     collection to accept data
      */
     public static <T> void readArray(PreparedStatement stmt, DsFactory<T> factory, Collection<T> out)
-            throws SQLException, InstantiationException, IllegalAccessException {
+            throws SQLException, ReflectiveOperationException {
         try (ResultSet rs = stmt.executeQuery()) {
             factory.readArray(out, rs);
         }
@@ -1889,7 +1889,7 @@ public class DsReader {
      * @param out     collection to receive data
      */
     public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, int limit, Collection<T> out)
-            throws SQLException, InstantiationException, IllegalAccessException {
+            throws SQLException, ReflectiveOperationException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             factory.readArray(out, rs, limit);
         }
@@ -1904,7 +1904,7 @@ public class DsReader {
      * @param out     collection to receive data
      */
     public static <T> void readArray(PreparedStatement stmt, DsFactory<T> factory, int limit, Collection<T> out)
-            throws SQLException, InstantiationException, IllegalAccessException {
+            throws SQLException, ReflectiveOperationException {
         try (ResultSet rs = stmt.executeQuery()) {
             factory.readArray(out, rs, limit);
         }

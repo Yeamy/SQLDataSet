@@ -1,4 +1,4 @@
-package yeamy.sql;
+package yeamy.sql.ds;
 
 /**
  * Implement this interface if you want to do something after the row read.
