@@ -23,7 +23,7 @@ class DsEnumField9 extends DsField {
 
     @Override
     public int compareTo(DsField o) {
-        return o instanceof DsBaseField ? 1
+        return o instanceof DsBaseField9 ? 1
                 : o instanceof DsEnumField9 ? 0
                 : -1;
     }
