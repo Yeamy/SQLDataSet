@@ -18,20 +18,35 @@ import java.util.List;
  */
 public class InternalDsFactory<T> implements DsFactory<T> {
     protected final Class<T> type;
-    private Unsafe unsafe;
     private Constructor<T> constructor;
+    private static final Unsafe unsafe;
+    private static final boolean java9;
+
+    static {
+        boolean b = true;
+        try {
+            java.lang.invoke.MethodHandles.lookup();
+        } catch (Exception ignored) {
+            b = false;
+        }
+        java9 = b;
+        Unsafe theUnsafe = null;
+        try {
+            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
+            Field f = unsafeClass.getDeclaredField("theUnsafe");
+            f.setAccessible(true);
+            theUnsafe = (Unsafe) f.get(null);
+        } catch (Exception ignored) {
+        }
+        unsafe = theUnsafe;
+    }
 
     /**
      * @param type type to generate
      */
     public InternalDsFactory(Class<T> type) {
         this.type = type;
-        try {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field f = unsafeClass.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            this.unsafe = (Unsafe) f.get(null);
-        } catch (Exception ignored) {
+        if (unsafe != null) {
             try {
                 this.constructor = type.getDeclaredConstructor();
             } catch (Exception ignored2) {
@@ -39,14 +54,8 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         }
     }
 
-    private boolean newApi(boolean multiple) {
-        if (multiple) {
-            try {
-                Class.forName("java.lang.invoke.MethodHandles");
-            } catch (Exception ignored) {
-            }
-        }
-        return false;
+    public boolean newApi(boolean multiple) {
+        return multiple && java9;
     }
 
     DsField createDsField(Field field, ResultSet rs, boolean newApi) throws ReflectiveOperationException {
@@ -58,14 +67,17 @@ public class InternalDsFactory<T> implements DsFactory<T> {
             if (field.isAnnotationPresent(DsColumn.class)) {// cannot read
                 return null;
             } else {
-                return newApi ? DsExtendField9.create(type, field, rs)
+                return newApi
+                        ? DsExtendField9.create(type, field, rs)
                         : DsExtendField.create(field, rs);
             }
         } else if (dsType == DsType.Enum) {
-            return newApi ? DsEnumField9.create(field, rs)
+            return newApi
+                    ? DsEnumField9.create(field, rs)
                     : DsEnumField.create(field, rs);
         } else {// base type
-            return newApi ? DsBaseField9.create(type, field, dsType, rs)
+            return newApi
+                    ? DsBaseField9.create(type, field, dsType, rs)
                     : DsBaseField.create(field, dsType, rs);
         }
     }
