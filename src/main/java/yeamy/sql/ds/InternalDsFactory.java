@@ -105,20 +105,15 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     private T createInstance() throws ReflectiveOperationException {
         if (unsafe != null) {
-            try {
-                return (T) unsafe.allocateInstance(type);
-            } catch (ReflectiveOperationException ignored) {
-            }
+            return (T) unsafe.allocateInstance(type);
         } else if (constructor != null) {
-            try {
-                return constructor.newInstance();
-            } catch (ReflectiveOperationException ignored) {
-            }
+            return constructor.newInstance();
+        } else {
+            return type.newInstance();
         }
-        return type.newInstance();
     }
 
     @Override
