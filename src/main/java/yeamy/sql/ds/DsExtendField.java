@@ -4,14 +4,16 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 class DsExtendField extends DsField {
     private final InternalDsFactory<?> factory;
     private final List<DsField> list;
 
-    public static DsExtendField create(Field field, ResultSet rs) throws ReflectiveOperationException {
+    public static DsExtendField create(Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap)
+            throws ReflectiveOperationException {
         InternalDsFactory<?> factory = new InternalDsFactory<>(field.getType());
-        List<DsField> list = factory.createDsFields(rs, false);
+        List<DsField> list = factory.createDsFields(rs, fieldMap, false);
         return list.get(0).columnIndex == -1 ? null : new DsExtendField(field, factory, list);
     }
 
@@ -22,8 +24,8 @@ class DsExtendField extends DsField {
     }
 
     @Override
-    public int compareTo(DsField o) {
-        return o instanceof DsExtendField ? 0 : 1;
+    int sortInt() {
+        return 2;
     }
 
     @Override

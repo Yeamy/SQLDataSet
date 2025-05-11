@@ -24,8 +24,8 @@ class DsBaseField9 extends DsField {
     }
 
     @Override
-    public int compareTo(DsField o) {
-        return o instanceof DsBaseField9 ? 0 : -1;
+    int sortInt() {
+        return 0;
     }
 
     @Override

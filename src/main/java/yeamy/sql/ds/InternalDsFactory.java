@@ -6,17 +6,14 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * The factory to generate java bean,
  * add custom types' adapter to create fields value.
  * You can cache the factory to avoid too much reflection.
  */
-public class InternalDsFactory<T> implements DsFactory<T> {
+class InternalDsFactory<T> {
     protected final Class<T> type;
     private Constructor<T> constructor;
     private static final Unsafe unsafe;
@@ -32,8 +29,7 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         java9 = b;
         Unsafe theUnsafe = null;
         try {
-            Class<?> unsafeClass = Class.forName("sun.misc.Unsafe");
-            Field f = unsafeClass.getDeclaredField("theUnsafe");
+            Field f = Unsafe.class.getDeclaredField("theUnsafe");
             f.setAccessible(true);
             theUnsafe = (Unsafe) f.get(null);
         } catch (Exception ignored) {
@@ -44,7 +40,7 @@ public class InternalDsFactory<T> implements DsFactory<T> {
     /**
      * @param type type to generate
      */
-    public InternalDsFactory(Class<T> type) {
+    InternalDsFactory(Class<T> type) {
         this.type = type;
         if (unsafe != null) {
             try {
@@ -54,23 +50,30 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         }
     }
 
-    public boolean newApi(boolean multiple) {
+    private boolean newApi(boolean multiple) {
         return multiple && java9;
     }
 
-    DsField createDsField(Field field, ResultSet rs, boolean newApi) throws ReflectiveOperationException {
+    private DsField createDsField(Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap,
+                                  boolean newApi) throws ReflectiveOperationException {
         if (field.isAnnotationPresent(DsIgnore.class)) {
             return null;
         }
         DsType dsType = DsType.getDsType(field);
         if (dsType == DsType.Extra) {// extra type
-            if (field.isAnnotationPresent(DsColumn.class)) {// cannot read
+            if (fieldMap != null) {
+                DsFieldReader<?> reader = fieldMap.get(field.getType());
+                if (reader != null) {
+                    return newApi
+                            ? DsReaderField9.create(type, field, rs, reader)
+                            : DsReaderField.create(field, rs, reader);
+                }
+            } else if (field.isAnnotationPresent(DsColumn.class)) {// cannot read
                 return null;
-            } else {
-                return newApi
-                        ? DsExtendField9.create(type, field, rs)
-                        : DsExtendField.create(field, rs);
             }
+            return newApi
+                    ? DsExtendField9.create(type, field, rs, fieldMap)
+                    : DsExtendField.create(field, rs, fieldMap);
         } else if (dsType == DsType.Enum) {
             return newApi
                     ? DsEnumField9.create(field, rs)
@@ -82,39 +85,20 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         }
     }
 
-    List<DsField> createDsFields(ResultSet rs, boolean multiple) throws ReflectiveOperationException {
+    List<DsField> createDsFields(ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap,
+                                 boolean multiple) throws ReflectiveOperationException {
         boolean newApi = newApi(multiple);
         ArrayList<DsField> list = new ArrayList<>();
         Field[] fields = type.getFields();
         for (Field field : fields) {
-            DsField f = createDsField(field, rs, newApi);
+            DsField f = createDsField(field, rs, fieldMap, newApi);
             if (f != null) {
                 f.setAccessible();
                 list.add(f);
             }
         }
-        Collections.sort(list);
+        list.sort(Comparator.comparingInt(DsField::sortInt));
         return list;
-    }
-
-    T read(ResultSet rs, List<DsField> list) throws SQLException, ReflectiveOperationException {
-        T t = createInstance();
-        for (DsField i : list) {
-            i.read(rs, t);
-        }
-        if (t instanceof DsObserver) {
-            ((DsObserver) t).onDsFinish();
-        }
-        return t;
-    }
-
-    @Override
-    public T read(ResultSet rs) throws SQLException, ReflectiveOperationException {
-        List<DsField> list = createDsFields(rs, false);
-        if (rs.next()) {
-            return read(rs, list);
-        }
-        return null;
     }
 
     @SuppressWarnings({"unchecked", "deprecation"})
@@ -128,9 +112,27 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         }
     }
 
-    @Override
-    public void readArray(Collection<T> out, ResultSet rs, int limit) throws SQLException, ReflectiveOperationException {
-        List<DsField> list = createDsFields(rs, true);
+    T read(ResultSet rs, List<DsField> list) throws SQLException, ReflectiveOperationException {
+        T t = createInstance();
+        for (DsField i : list) {
+            i.read(rs, t);
+        }
+        if (t instanceof DsObserver) {
+            ((DsObserver) t).onDsFinish();
+        }
+        return t;
+    }
+
+    T read(ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap) throws SQLException, ReflectiveOperationException {
+        List<DsField> list = createDsFields(rs, fieldMap, false);
+        if (rs.next()) {
+            return read(rs, list);
+        }
+        return null;
+    }
+
+    void readArray(ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap, Collection<T> out, int limit) throws SQLException, ReflectiveOperationException {
+        List<DsField> list = createDsFields(rs, fieldMap, true);
         while (rs.next()) {
             if (limit-- <= 0) {
                 break;
@@ -139,9 +141,8 @@ public class InternalDsFactory<T> implements DsFactory<T> {
         }
     }
 
-    @Override
-    public void readArray(Collection<T> out, ResultSet rs) throws SQLException, ReflectiveOperationException {
-        List<DsField> list = createDsFields(rs, true);
+    void readArray(ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap, Collection<T> out) throws SQLException, ReflectiveOperationException {
+        List<DsField> list = createDsFields(rs, fieldMap, true);
         while (rs.next()) {
             out.add(read(rs, list));
         }

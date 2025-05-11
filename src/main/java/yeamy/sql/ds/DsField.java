@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-abstract class DsField implements Comparable<DsField> {
+abstract class DsField {
     final Field field;
     final int columnIndex;
 
@@ -15,6 +15,8 @@ abstract class DsField implements Comparable<DsField> {
     }
 
     abstract void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException;
+
+    abstract int sortInt();
 
     void setAccessible() {
         int flag = field.getModifiers();

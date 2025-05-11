@@ -7,10 +7,10 @@ SQLDataSet
 Android平台SQLite可以看这里[SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
 ```groovy
-    implementation 'io.github.yeamy:sqldataset:1.1'
+    implementation 'io.github.yeamy:sqldataset:2.0'
 ```
 ### 1. Bean类声明
-```
+```java
 public class Fruit {
 
     @DsColumn("Name")
@@ -38,22 +38,34 @@ Fruit apple = DsReader.read(stmt, sql, Fruit.class);
 ArrayList<Fruit> list = DsReader.readArray(stmt, sql, Fruit.class);
 ```
 
-### 3. DsFactory\<T>
-使用自定义工厂类生产对象。
+### 3. DsFieldFactory\<T>
+使用自定义工厂类解析列。
 
 ```java
-DsFactory<Fruit> factory = new DsFactory<>() {
-    ...
-};
+DsReader.register(MyField.class, new DsFieldReader<MyField>() {
 
-Fruit fruit = DsReader.read(stmt, sql, factory);
+    @Override
+    public MyField read(ResultSet rs, int columnIndex) throws SQLException, ReflectiveOperationException {
+        return new MyType(rs.getString(columnIndex));
+    }
+);
+DsReader.read(stmt, String sql, MyType.class);
+// or
+DsReader.with(MyField.class, new DsFieldReader<MyField>() {
+
+    @Override
+    public MyField read(ResultSet rs, int columnIndex) throws SQLException, ReflectiveOperationException {
+        return new MyType(rs.getString(columnIndex));
+    }
+
+).read(stmt, String sql, MyType.class);
 ```
 
 
 ### 4. DsObserver
 如果导入DsObserver接口，解析结束后会调用onDsFinish()方法，可以在此方法修改数据。
 
-```
+```java
 public class Vegetables implements DsObserver {
 
     @DsColumn("Name")
@@ -94,7 +106,7 @@ public class User {
 
 为了将province和city封装到同个参数内，可以使用如下方式：
 
-```
+```java
 public class User {
     @DsColumn("UserName")
     public String name;

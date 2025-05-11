@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DsReader {
@@ -1574,12 +1575,10 @@ public class DsReader {
      * @param stmt the database to read
      * @param sql  the query sql statement
      * @param out  given map to receive row data
-     * @return the given map with row data or null if no result
      */
-    public static <T extends Map<String, Object>> T read(Statement stmt, String sql, T out) throws SQLException {
+    public static void read(Statement stmt, String sql, Map<String, Object> out) throws SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             DsMapFactory.read(rs, out);
-            return out;
         }
     }
 
@@ -1588,12 +1587,10 @@ public class DsReader {
      *
      * @param stmt the database to read
      * @param out  given map to receive row data
-     * @return the given map with row data or null if no result
      */
-    public static <T extends Map<String, Object>> T read(PreparedStatement stmt, T out) throws SQLException {
+    public static void read(PreparedStatement stmt, Map<String, Object> out) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
             DsMapFactory.read(rs, out);
-            return out;
         }
     }
 
@@ -1696,7 +1693,9 @@ public class DsReader {
      */
     public static <T> T read(Statement stmt, String sql, Class<T> type)
             throws ReflectiveOperationException, SQLException {
-        return read(stmt, sql, new InternalDsFactory<>(type));
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            return new InternalDsFactory<>(type).read(rs, fieldMap);
+        }
     }
 
     /**
@@ -1706,37 +1705,9 @@ public class DsReader {
      * @param type given type to return
      * @return the row data as object, null if no result
      */
-    public static <T> T read(PreparedStatement stmt, Class<T> type)
-            throws ReflectiveOperationException, SQLException {
-        return read(stmt, new InternalDsFactory<>(type));
-    }
-
-    /**
-     * read the first row as the given type
-     *
-     * @param stmt     the database to read
-     * @param sql      the query sql statement
-     * @param factory  factory of given type
-     * @return the row data as object or return fallback if no result
-     */
-    public static <T> T read(Statement stmt, String sql, DsFactory<T> factory)
-            throws ReflectiveOperationException, SQLException {
-        try (ResultSet rs = stmt.executeQuery(sql)) {
-            return factory.read(rs);
-        }
-    }
-
-    /**
-     * read the first row as the given type
-     *
-     * @param stmt     the database to read
-     * @param factory  factory of given type
-     * @return the row data as object or return fallback if no result
-     */
-    public static <T> T read(PreparedStatement stmt, DsFactory<T> factory)
-            throws ReflectiveOperationException, SQLException {
+    public static <T> T read(PreparedStatement stmt, Class<T> type) throws ReflectiveOperationException, SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
-            return factory.read(rs);
+            return new InternalDsFactory<>(type).read(rs, fieldMap);
         }
     }
 
@@ -1751,7 +1722,7 @@ public class DsReader {
     public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> type)
             throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>();
-        readArray(stmt, sql, new InternalDsFactory<>(type), out);
+        readArray(stmt, sql, type, out);
         return out;
     }
 
@@ -1765,7 +1736,7 @@ public class DsReader {
     public static <T> ArrayList<T> readArray(PreparedStatement stmt, Class<T> type)
             throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>();
-        readArray(stmt, new InternalDsFactory<>(type), out);
+        readArray(stmt, type, out);
         return out;
     }
 
@@ -1779,7 +1750,9 @@ public class DsReader {
      */
     public static <T> void readArray(Statement stmt, String sql, Class<T> type, Collection<T> out)
             throws ReflectiveOperationException, SQLException {
-        readArray(stmt, sql, new InternalDsFactory<>(type), out);
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            new InternalDsFactory<>(type).readArray(rs, fieldMap, out);
+        }
     }
 
     /**
@@ -1791,7 +1764,9 @@ public class DsReader {
      */
     public static <T> void readArray(PreparedStatement stmt, Class<T> type, Collection<T> out)
             throws ReflectiveOperationException, SQLException {
-        readArray(stmt, new InternalDsFactory<>(type), out);
+        try (ResultSet rs = stmt.executeQuery()) {
+            new InternalDsFactory<>(type).readArray(rs, fieldMap, out);
+        }
     }
 
     /**
@@ -1806,7 +1781,7 @@ public class DsReader {
     public static <T> ArrayList<T> readArray(Statement stmt, String sql, Class<T> type, int limit)
             throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>(limit);
-        readArray(stmt, sql, new InternalDsFactory<>(type), limit, out);
+        readArray(stmt, sql, type, out, limit);
         return out;
     }
 
@@ -1821,7 +1796,7 @@ public class DsReader {
     public static <T> ArrayList<T> readArray(PreparedStatement stmt, Class<T> type, int limit)
             throws ReflectiveOperationException, SQLException {
         ArrayList<T> out = new ArrayList<>(limit);
-        readArray(stmt, new InternalDsFactory<>(type), limit, out);
+        readArray(stmt, type, out, limit);
         return out;
     }
 
@@ -1835,7 +1810,9 @@ public class DsReader {
      */
     public static <T> void readArray(Statement stmt, String sql, Class<T> type, Collection<T> out, int limit)
             throws ReflectiveOperationException, SQLException {
-        readArray(stmt, sql, new InternalDsFactory<>(type), limit, out);
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            new InternalDsFactory<>(type).readArray(rs, fieldMap, out, limit);
+        }
     }
 
     /**
@@ -1847,67 +1824,36 @@ public class DsReader {
      */
     public static <T> void readArray(PreparedStatement stmt, Class<T> type, Collection<T> out, int limit)
             throws ReflectiveOperationException, SQLException {
-        readArray(stmt, new InternalDsFactory<>(type), limit, out);
-    }
-
-    /**
-     * read rows as the given type into the given list
-     *
-     * @param stmt    the database to read
-     * @param sql     the query sql statement
-     * @param factory factory of given type
-     * @param out     collection to accept data
-     */
-    public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, Collection<T> out)
-            throws SQLException, ReflectiveOperationException {
-        try (ResultSet rs = stmt.executeQuery(sql)) {
-            factory.readArray(out, rs);
-        }
-    }
-
-    /**
-     * read rows as the given type into the given list
-     *
-     * @param stmt    the database to read
-     * @param factory factory of given type
-     * @param out     collection to accept data
-     */
-    public static <T> void readArray(PreparedStatement stmt, DsFactory<T> factory, Collection<T> out)
-            throws SQLException, ReflectiveOperationException {
         try (ResultSet rs = stmt.executeQuery()) {
-            factory.readArray(out, rs);
+            new InternalDsFactory<>(type).readArray(rs, fieldMap, out, limit);
         }
     }
 
-    /**
-     * read rows as the given type into the given list
-     *
-     * @param stmt    the database to read
-     * @param sql     the query sql statement
-     * @param factory factory of given type
-     * @param limit   limit how many rows to read
-     * @param out     collection to receive data
-     */
-    public static <T> void readArray(Statement stmt, String sql, DsFactory<T> factory, int limit, Collection<T> out)
-            throws SQLException, ReflectiveOperationException {
-        try (ResultSet rs = stmt.executeQuery(sql)) {
-            factory.readArray(out, rs, limit);
-        }
-    }
+    //---------------------------------------------------------------------------
+
+    private static Map<Class<?>, DsFieldReader<?>> fieldMap;
 
     /**
-     * read rows as the given type into the given list
+     * add a global field reader
      *
-     * @param stmt    the database to read
-     * @param factory factory of given type
-     * @param limit   limit how many rows to read
-     * @param out     collection to receive data
+     * @param type   field type
+     * @param reader the field reader
      */
-    public static <T> void readArray(PreparedStatement stmt, DsFactory<T> factory, int limit, Collection<T> out)
-            throws SQLException, ReflectiveOperationException {
-        try (ResultSet rs = stmt.executeQuery()) {
-            factory.readArray(out, rs, limit);
-        }
+    public static <F> void register(Class<F> type, DsFieldReader<F> reader) {
+        if (fieldMap == null) fieldMap = new HashMap<>();
+        fieldMap.put(type, reader);
+    }
+
+    //---------------------------------------------------------------------------
+
+    /**
+     * create DsInsReader with a field reader
+     *
+     * @param type   field type
+     * @param reader the field reader
+     */
+    public static <F> DsInsReader with(Class<F> type, DsFieldReader<F> reader) {
+        return new DsInsReader().with(type, reader);
     }
 
 }

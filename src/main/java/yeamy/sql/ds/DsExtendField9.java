@@ -6,15 +6,16 @@ import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 class DsExtendField9 extends DsField {
     private final InternalDsFactory<?> factory;
     private final List<DsField> list;
     private final VarHandle vh;
 
-    public static DsExtendField9 create(Class<?> type, Field field, ResultSet rs) throws ReflectiveOperationException {
+    public static DsExtendField9 create(Class<?> type, Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap) throws ReflectiveOperationException {
         InternalDsFactory<?> factory = new InternalDsFactory<>(field.getType());
-        List<DsField> list = factory.createDsFields(rs, true);
+        List<DsField> list = factory.createDsFields(rs, fieldMap, true);
         return list.get(0).columnIndex == -1 ? null : new DsExtendField9(type, field, factory, list);
     }
 
@@ -26,8 +27,8 @@ class DsExtendField9 extends DsField {
     }
 
     @Override
-    public int compareTo(DsField o) {
-        return o instanceof DsExtendField9 ? 0 : 1;
+    int sortInt() {
+        return 2;
     }
 
     @Override

@@ -3,10 +3,7 @@ package yeamy.sql.ds;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DsMapFactory {
 
@@ -19,14 +16,14 @@ public class DsMapFactory {
         return fields;
     }
 
-    private static void read(ResultSet rs, Map<String, Object> map, ArrayList<String> list) throws SQLException {
+    private static void read(ResultSet rs, Map<String, Object> map, List<String> list) throws SQLException {
         for (int i = 0, l = list.size(); i < l; i++) {
             String label = list.get(i);
             Object value = rs.getObject(i + 1);
             map.put(label, value);
         }
     }
-    private static LinkedHashMap<String, Object> read(ResultSet rs, ArrayList<String> list) throws SQLException {
+    private static LinkedHashMap<String, Object> read(ResultSet rs, List<String> list) throws SQLException {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
         read(rs, map, list);
         return map;
@@ -56,14 +53,13 @@ public class DsMapFactory {
         return out;
     }
 
-    public static void readArray(ResultSet rs, Collection<Map<String, Object>> collection,
-                                                           int limit) throws SQLException {
+    public static void readArray(ResultSet rs, Collection<Map<String, Object>> col, int limit) throws SQLException {
         ArrayList<String> list = findColumnIndex(rs);
         while (rs.next()) {
             if (limit-- <= 0) {
                 break;
             }
-            collection.add(read(rs, list));
+            col.add(read(rs, list));
         }
     }
 

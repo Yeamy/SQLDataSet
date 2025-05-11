@@ -1,8 +1,8 @@
-import yeamy.sql.DsColumn;
+import yeamy.sql.ds.DsColumn;
 
 public class Bean {
 
-    public String ab_cd_ef;
+    private String ab_cd_ef;
 
     @DsColumn("ab_cd_ef")
     public String abcdef;

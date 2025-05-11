@@ -7,10 +7,10 @@ A simple orm, deserialize data from `JDBC ResultSet` as java bean.
 For Android SQLite also see [SQLiteDataSet](https://github.com/Yeamy/SQLiteDataSet)
 
 ```groovy
-    implementation 'io.github.yeamy:sqldataset:1.1'
+    implementation 'io.github.yeamy:sqldataset:2.0'
 ```
 ### 1. Annotation
-``````
+```java
 public class Fruit {
 
     @DsColumn("Name")
@@ -31,28 +31,39 @@ public class Fruit {
 ### 2. DsReader
 Generally, using `DsReader` is an easy and fast way.
 
-```
+```java
 Statement stmt = ...;                                 // the source
 String sql = "SELECT ...";                            // the sql
 Fruit apple = DsReader.read(stmt, sql, Fruit.class);  // read one
 ArrayList<Fruit> list = DsReader.eadArray(stmt, sql, Fruit.class);
 ```
 
-### 3. DsFactory\<T> & DsAdapter
-In order to deserialize custom type, you may define a `DsFactory`.
+### 3. DsFieldFactory\<T>
+In order to deserialize custom field type, you may define a `DsFieldFactory`.
 
 ```java
-DsFactory<Fruit> factory = new DsFactory<>() {
-    //...
-};
+DsReader.register(MyField.class, new DsFieldReader<MyField>() {
 
-Fruit fruit = DsReader.read(stmt, sql, factory);
+    @Override
+    public MyField read(ResultSet rs, int columnIndex) throws SQLException, ReflectiveOperationException {
+        return new MyType(rs.getString(columnIndex));
+    }
+);
+DsReader.read(stmt, String sql, MyType.class);
+// or
+DsReader.with(MyField.class, new DsFieldReader<MyField>() {
+
+    @Override
+    public MyField read(ResultSet rs, int columnIndex) throws SQLException, ReflectiveOperationException {
+        return new MyType(rs.getString(columnIndex));
+    }
+).read(stmt, String sql, MyType.class);
 ```
 
 ### 4. DsObserver
 If you want to do anything after the Bean read, you can implement `DsObserver.class`, and do it in `onDsFinish()`.
 
-```
+```java
 public class Vegetables implements DsObserver {
 
     @DsColumn("Name")
@@ -94,7 +105,7 @@ public class User {
 
 to package `province` and `city` into same field `location`, see below:
 
-```
+```java
 public class User {
 
     @DsColumn("UserName")
