@@ -3,7 +3,6 @@ plugins {
 }
 
 group 'io.github.yeamy'
-version '2.0'
 
 repositories {
     mavenCentral()
@@ -54,7 +53,7 @@ publishing {
         maven(MavenPublication) {
             groupId 'io.github.yeamy'
             artifactId 'sqldataset'
-            version '1.1'
+            version '2.0'
             pom {
                 name = 'sqldataset'
                 description = 'Deserialize data from JDBC ResultSet as java bean.'
