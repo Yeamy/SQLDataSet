@@ -23,7 +23,7 @@ class DsExtendField9 extends DsField {
         super(field, list.get(0).columnIndex);
         this.factory = factory;
         this.list = list;
-        this.vh = MethodHandles.lookup().findVarHandle(field.getType(), field.getName(), type);
+        this.vh = MethodHandles.lookup().findVarHandle(type, field.getName(), field.getType());
     }
 
     @Override
@@ -33,6 +33,6 @@ class DsExtendField9 extends DsField {
 
     @Override
     public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
-        vh.set(this.factory.read(rs, this.list));
+        vh.set(t, this.factory.read(rs, this.list));
     }
 }

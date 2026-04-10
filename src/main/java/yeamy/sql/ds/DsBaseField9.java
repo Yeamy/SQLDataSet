@@ -20,7 +20,7 @@ class DsBaseField9 extends DsField {
     DsBaseField9(Class<?> type, Field field, int columnIndex, DsType dsType) throws ReflectiveOperationException {
         super(field, columnIndex);
         this.dsType = dsType;
-        this.vh = MethodHandles.lookup().findVarHandle(field.getType(), field.getName(), type);
+        this.vh = MethodHandles.lookup().findVarHandle(type, field.getName(), field.getType());
     }
 
     @Override
@@ -33,52 +33,52 @@ class DsBaseField9 extends DsField {
         switch (dsType) {
             case _boolean:
             case Boolean:
-                vh.set(rs.getBoolean(columnIndex));
+                vh.set(t, rs.getBoolean(columnIndex));
                 break;
             case _byte:
             case Byte:
-                vh.set(rs.getByte(columnIndex));
+                vh.set(t, rs.getByte(columnIndex));
                 break;
             case _short:
             case Short:
-                vh.set(rs.getShort(columnIndex));
+                vh.set(t, rs.getShort(columnIndex));
                 break;
             case _int:
             case Integer:
-                vh.set(rs.getInt(columnIndex));
+                vh.set(t, rs.getInt(columnIndex));
                 break;
             case _long:
             case Long:
-                vh.set(rs.getLong(columnIndex));
+                vh.set(t, rs.getLong(columnIndex));
                 break;
             case _float:
             case Float:
-                vh.set(rs.getFloat(columnIndex));
+                vh.set(t, rs.getFloat(columnIndex));
                 break;
             case _double:
             case Double:
-                vh.set(rs.getDouble(columnIndex));
+                vh.set(t, rs.getDouble(columnIndex));
                 break;
             case BigDecimal:
-                vh.set(rs.getBigDecimal(columnIndex));
+                vh.set(t, rs.getBigDecimal(columnIndex));
                 break;
             case String:
-                vh.set(rs.getString(columnIndex));
+                vh.set(t, rs.getString(columnIndex));
                 break;
             case Date:
-                vh.set(rs.getDate(columnIndex, calendar));
+                vh.set(t, rs.getDate(columnIndex, calendar));
                 break;
             case Time:
-                vh.set(rs.getTime(columnIndex, calendar));
+                vh.set(t, rs.getTime(columnIndex, calendar));
                 break;
             case Timestamp:
-                vh.set(rs.getTimestamp(columnIndex, calendar));
+                vh.set(t, rs.getTimestamp(columnIndex, calendar));
                 break;
             case URL:
-                vh.set(rs.getURL(columnIndex));
+                vh.set(t, rs.getURL(columnIndex));
                 break;
             case Blob:
-                vh.set(rs.getBlob(columnIndex));
+                vh.set(t, rs.getBlob(columnIndex));
                 break;
             default:
         }
