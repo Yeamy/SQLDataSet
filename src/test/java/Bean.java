@@ -1,24 +1,37 @@
 import yeamy.sql.ds.DsColumn;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+
 public class Bean {
 
-    private String ab_cd_ef;
+    private int demo_id;
 
-    @DsColumn("ab_cd_ef")
+    private int demoId;
+
+    @DsColumn("str")
     public String abcdef;
 
-    public String abCdEf;
+    public String str;
+
+    public String createTime;
 
     public Extend extend;
 
+    public Date date_time;
+
+    public static class Extend {
+        public BigDecimal bigdecimel;
+
+        @Override
+        public String toString() {
+            return "Extend{ bigdecimel:" + bigdecimel + "}";
+        }
+    }
+
     @Override
     public String toString() {
-        return "full_math= " + ab_cd_ef
-                + " | by_ann= " + abcdef
-                + " | by_camel= " + abCdEf
-                + " | extend= " + extend.abCdEf;
-    }
-    public static class Extend {
-        public String abCdEf;
+        return "Bean{demo_id:" + demo_id + " demoId:" + demoId + " abcdef:" + abcdef + " str:" + str
+                +" createTime:" + createTime + " extend:" + extend + " date_time:" + date_time + "}";
     }
 }

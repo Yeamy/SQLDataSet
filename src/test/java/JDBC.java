@@ -17,8 +17,8 @@ public class JDBC implements Closeable {
 		info.setProperty("allowPublicKeyRetrieval", "true");
 		info.setProperty("useSSL", "false");
 		info.setProperty("serverTimezone", "GMT+8");
-		info.setProperty("user", "admin");
-		info.setProperty("password", "admin123");
+		info.setProperty("user", "root");
+		info.setProperty("password", "Admin@123");
 	}
 
 	private void initConnection() throws SQLException {
