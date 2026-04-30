@@ -7,17 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 class DsExtendField extends DsField {
+    private final ExtendFactory<?> factory;
     private final List<DsField> list;
 
-    public static DsExtendField create(Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap)
+    public static DsExtendField create(InternalDsFactory<?> factory, Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap)
             throws ReflectiveOperationException {
-        InternalDsFactory<?> factory = new InternalDsFactory<>(field.getType());
-        List<DsField> list = factory.createDsFields(rs, fieldMap, false);
-        return list.get(0).columnIndex == -1 ? null : new DsExtendField(field, list);
+        ExtendFactory<?> extend = new ExtendFactory<>(factory, field.getType());
+        List<DsField> list = extend.createDsFields(rs, fieldMap, false);
+        return list.size() == 0 ? null : new DsExtendField(extend, field, list);
     }
 
-    DsExtendField(Field field, List<DsField> list) {
-        super(field, list.get(0).columnIndex);
+    DsExtendField(ExtendFactory<?> factory, Field field, List<DsField> list) {
+        super(field, -1);
+        this.factory = factory;
         this.list = list;
     }
 
@@ -27,7 +29,7 @@ class DsExtendField extends DsField {
     }
 
     @Override
-    public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
-        field.set(t, factory.read(rs, this.list));
+    public void read(ResultSet rs, Object t, InternalDsFactory<?> parent) throws SQLException, ReflectiveOperationException {
+        field.set(t, this.factory.read(rs, this.list));
     }
 }

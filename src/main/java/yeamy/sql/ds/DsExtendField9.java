@@ -9,17 +9,19 @@ import java.util.List;
 import java.util.Map;
 
 class DsExtendField9 extends DsField {
+    private final ExtendFactory<?> factory;
     private final List<DsField> list;
     private final VarHandle vh;
 
-    public static DsExtendField9 create(Class<?> type, Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap) throws ReflectiveOperationException {
-        InternalDsFactory<?> factory = new InternalDsFactory<>(field.getType());
+    public static DsExtendField9 create(InternalDsFactory<?> factory, Class<?> type, Field field, ResultSet rs, Map<Class<?>, DsFieldReader<?>> fieldMap) throws ReflectiveOperationException {
+        ExtendFactory<?> extend = new ExtendFactory<>(factory, field.getType());
         List<DsField> list = factory.createDsFields(rs, fieldMap, true);
-        return list.get(0).columnIndex == -1 ? null : new DsExtendField9(type, field, list);
+        return list.size() == 0 ? null : new DsExtendField9(extend, type, field, list);
     }
 
-    DsExtendField9(Class<?> type, Field field, List<DsField> list) throws ReflectiveOperationException {
-        super(field, list.get(0).columnIndex);
+    DsExtendField9(ExtendFactory<?> factory, Class<?> type, Field field, List<DsField> list) throws ReflectiveOperationException {
+        super(field, -1);
+        this.factory = factory;
         this.list = list;
         this.vh = MethodHandles.lookup().findVarHandle(type, field.getName(), field.getType());
     }
@@ -31,6 +33,6 @@ class DsExtendField9 extends DsField {
 
     @Override
     public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
-        vh.set(t, factory.read(rs, this.list));
+        vh.set(t, this.factory.read(rs, this.list));
     }
 }

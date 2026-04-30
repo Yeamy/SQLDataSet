@@ -78,8 +78,8 @@ class InternalDsFactory<T> {
                 return null;
             }
             return newApi
-                    ? DsExtendField9.create(type, field, rs, fieldMap)
-                    : DsExtendField.create(field, rs, fieldMap);
+                    ? DsExtendField9.create(this, type, field, rs, fieldMap)
+                    : DsExtendField.create(this, field, rs, fieldMap);
         } else if (dsType == DsType.Enum) {
             return newApi
                     ? DsEnumField9.create(field, rs)
