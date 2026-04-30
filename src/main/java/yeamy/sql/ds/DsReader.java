@@ -1545,6 +1545,161 @@ public class DsReader {
     }
 
     /**
+     * Return the value of the first column of the first row as Array
+     *
+     * @param stmt the database to read
+     * @return value as Array or null if no query result
+     */
+    public static Array getArray(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getArray(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as Array
+     *
+     * @param stmt the database to read
+     * @param sql  the query sql statement
+     * @return value as Array or null if no query result
+     */
+    public static Array getArray(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getArray(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as Clob
+     *
+     * @param stmt the database to read
+     * @return value as Clob or null if no query result
+     */
+    public static Clob getClob(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getClob(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as Clob
+     *
+     * @param stmt the database to read
+     * @param sql  the query sql statement
+     * @return value as Clob or null if no query result
+     */
+    public static Clob getClob(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getClob(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as NClob
+     *
+     * @param stmt the database to read
+     * @return value as NClob or null if no query result
+     */
+    public static NClob getNClob(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getNClob(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as NClob
+     *
+     * @param stmt the database to read
+     * @param sql  the query sql statement
+     * @return value as NClob or null if no query result
+     */
+    public static NClob getNClob(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getNClob(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as Ref
+     *
+     * @param stmt the database to read
+     * @return value as Ref or null if no query result
+     */
+    public static Ref getRef(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getRef(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as Ref
+     *
+     * @param stmt the database to read
+     * @param sql  the query sql statement
+     * @return value as Ref or null if no query result
+     */
+    public static Ref getRef(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getRef(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as SQLXML
+     *
+     * @param stmt the database to read
+     * @return value as SQLXML or null if no query result
+     */
+    public static SQLXML getSQLXML(PreparedStatement stmt) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getSQLXML(1);
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Return the value of the first column of the first row as SQLXML
+     *
+     * @param stmt the database to read
+     * @param sql  the query sql statement
+     * @return value as SQLXML or null if no query result
+     */
+    public static SQLXML getSQLXML(Statement stmt, String sql) throws SQLException {
+        try (ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getSQLXML(1);
+            }
+            return null;
+        }
+    }
+
+    /**
      * read the first row as map
      *
      * @param stmt the database to read

@@ -27,6 +27,11 @@ public enum DsType {
 	Timestamp(java.sql.Timestamp.class), //
 	URL(java.net.URL.class), //
 	Blob(java.sql.Blob.class), //
+	Array(java.sql.Array.class),
+	Clob(java.sql.Clob.class),
+	NClob(java.sql.NClob.class),
+	Ref(java.sql.Ref.class),
+	SQLXML(java.sql.SQLXML.class),
 	Enum(java.lang.Enum.class),
 	Extra(Object.class), // custom type without DsColumn and DsIgnore
 	;

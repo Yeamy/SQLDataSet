@@ -74,6 +74,20 @@ class DsBaseField extends DsField {
             case Blob:
                 field.set(t, rs.getBlob(columnIndex));
                 break;
+            case Ref:
+                field.set(t, rs.getRef(columnIndex));
+                break;
+            case Clob:
+                field.set(t, rs.getClob(columnIndex));
+            case NClob:
+                field.set(t, rs.getNClob(columnIndex));
+                break;
+            case SQLXML:
+                field.set(t, rs.getSQLXML(columnIndex));
+                break;
+            case Array:
+                field.set(t, rs.getArray(columnIndex));
+                break;
             default:
         }
     }
