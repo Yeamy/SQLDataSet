@@ -27,7 +27,7 @@ class DsReaderField9 extends DsField {
     }
 
     @Override
-    public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
+    public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         vh.set(t, reader.read(rs, columnIndex));
     }
 }

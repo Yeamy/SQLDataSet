@@ -14,7 +14,7 @@ abstract class DsField {
         this.columnIndex = columnIndex;
     }
 
-    abstract void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException;
+    abstract void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException;
 
     abstract int sortInt();
 

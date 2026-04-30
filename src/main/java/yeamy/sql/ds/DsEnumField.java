@@ -32,7 +32,7 @@ class DsEnumField extends DsField {
     }
 
     @Override
-    public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
+    public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         String data = rs.getString(columnIndex);
         Object obj = method.invoke(type, data);
         field.set(t, obj);

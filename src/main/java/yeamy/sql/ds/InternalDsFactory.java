@@ -14,6 +14,7 @@ import java.util.*;
  * You can cache the factory to avoid too much reflection.
  */
 class InternalDsFactory<T> {
+    private Calendar calendar;
     protected final Class<T> type;
     private Constructor<T> constructor;
     private static final Unsafe unsafe;
@@ -48,6 +49,11 @@ class InternalDsFactory<T> {
             } catch (Exception ignored2) {
             }
         }
+    }
+
+    Calendar getCalendar() {
+        if (calendar == null) calendar = Calendar.getInstance();
+        return calendar;
     }
 
     private boolean newApi(boolean multiple) {
@@ -115,7 +121,7 @@ class InternalDsFactory<T> {
     T read(ResultSet rs, List<DsField> list) throws SQLException, ReflectiveOperationException {
         T t = createInstance();
         for (DsField i : list) {
-            i.read(rs, t);
+            i.read(rs, t, this);
         }
         if (t instanceof DsObserver) {
             ((DsObserver) t).onDsFinish();

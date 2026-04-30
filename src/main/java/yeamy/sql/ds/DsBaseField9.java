@@ -5,10 +5,8 @@ import java.lang.invoke.VarHandle;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
 
 class DsBaseField9 extends DsField {
-    private static final Calendar calendar = Calendar.getInstance();
     private final DsType dsType;
     private final VarHandle vh;
 
@@ -29,7 +27,7 @@ class DsBaseField9 extends DsField {
     }
 
     @Override
-    public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
+    public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         switch (dsType) {
             case _boolean:
             case Boolean:
@@ -66,13 +64,13 @@ class DsBaseField9 extends DsField {
                 vh.set(t, rs.getString(columnIndex));
                 break;
             case Date:
-                vh.set(t, rs.getDate(columnIndex, calendar));
+                vh.set(t, rs.getDate(columnIndex, factory.getCalendar()));
                 break;
             case Time:
-                vh.set(t, rs.getTime(columnIndex, calendar));
+                vh.set(t, rs.getTime(columnIndex, factory.getCalendar()));
                 break;
             case Timestamp:
-                vh.set(t, rs.getTimestamp(columnIndex, calendar));
+                vh.set(t, rs.getTimestamp(columnIndex, factory.getCalendar()));
                 break;
             case URL:
                 vh.set(t, rs.getURL(columnIndex));

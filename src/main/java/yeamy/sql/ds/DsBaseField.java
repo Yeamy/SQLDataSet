@@ -3,10 +3,8 @@ package yeamy.sql.ds;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
 
 class DsBaseField extends DsField {
-    private static final Calendar calendar = Calendar.getInstance();
     private final DsType dsType;
 
     public static DsField create(Field field, DsType dsType, ResultSet rs) {
@@ -25,7 +23,7 @@ class DsBaseField extends DsField {
     }
 
     @Override
-    public void read(ResultSet rs, Object t) throws SQLException, ReflectiveOperationException {
+    public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         switch (dsType) {
             case _boolean:
             case Boolean:
@@ -62,13 +60,13 @@ class DsBaseField extends DsField {
                 field.set(t, rs.getString(columnIndex));
                 break;
             case Date:
-                field.set(t, rs.getDate(columnIndex, calendar));
+                field.set(t, rs.getDate(columnIndex, factory.getCalendar()));
                 break;
             case Time:
-                field.set(t, rs.getTime(columnIndex, calendar));
+                field.set(t, rs.getTime(columnIndex, factory.getCalendar()));
                 break;
             case Timestamp:
-                field.set(t, rs.getTimestamp(columnIndex, calendar));
+                field.set(t, rs.getTimestamp(columnIndex, factory.getCalendar()));
                 break;
             case URL:
                 field.set(t, rs.getURL(columnIndex));
