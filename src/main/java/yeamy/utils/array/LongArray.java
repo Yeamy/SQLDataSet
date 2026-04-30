@@ -13,16 +13,29 @@ public class LongArray {
 		array = new long[length];
 	}
 
+	private void expand(int targetLength) {
+		long[] dest = new long[targetLength];
+		System.arraycopy(array, 0, dest, 0, length);
+		this.array = dest;
+
+	}
+
 	public void add(long n) {
-		long[] src = this.array;
 		int index = length;
 		if (index == array.length) {
-			long[] dest = new long[array.length + 16];
-			System.arraycopy(src, 0, dest, 0, index);
-			this.array = src = dest;
+			expand(array.length + 16);
 		}
-		src[index] = n;
+		array[index] = n;
 		++length;
+	}
+
+	public void add(long... n) {
+		int index = length;
+		if (index + n.length <= array.length) {
+			expand(array.length + n.length + 16);
+		}
+		System.arraycopy(n, n.length, array, index, n.length);
+		length += n.length;
 	}
 
 	@Override

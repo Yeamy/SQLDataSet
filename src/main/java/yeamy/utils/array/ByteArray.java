@@ -2,7 +2,7 @@ package yeamy.utils.array;
 
 public class ByteArray {
 
-	private int size = 0;
+	private int length = 0;
 	private byte[] array;
 
 	public ByteArray() {
@@ -13,23 +13,36 @@ public class ByteArray {
 		array = new byte[size];
 	}
 
+	private void expand(int targetLength) {
+		byte[] dest = new byte[targetLength];
+		System.arraycopy(array, 0, dest, 0, length);
+		this.array = dest;
+
+	}
+
 	public void add(byte n) {
-		byte[] src = this.array;
-		int index = size;
+		int index = length;
 		if (index == array.length) {
-			byte[] dest = new byte[array.length + 16];
-			System.arraycopy(src, 0, dest, 0, index);
-			this.array = src = dest;
+			expand(array.length + 16);
 		}
-		src[index] = n;
-		++size;
+		array[index] = n;
+		++length;
+	}
+
+	public void add(byte... n) {
+		int index = length;
+		if (index + n.length <= array.length) {
+			expand(array.length + n.length + 16);
+		}
+		System.arraycopy(n, n.length, array, index, n.length);
+		length += n.length;
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder().append('[');
 		boolean f = true;
-		for (int i = 0; i < size; i++) {
+		for (int i = 0; i < length; i++) {
 			if (f) {
 				f = false;
 			} else {
@@ -42,14 +55,14 @@ public class ByteArray {
 	}
 
 	public void trimToSize() {
-		byte[] dest = new byte[size];
-		System.arraycopy(array, 0, dest, 0, size);
+		byte[] dest = new byte[length];
+		System.arraycopy(array, 0, dest, 0, length);
 		this.array = dest;
 	}
 
 	public byte[] getArray() {
-		byte[] dest = new byte[size];
-		System.arraycopy(array, 0, dest, 0, size);
+		byte[] dest = new byte[length];
+		System.arraycopy(array, 0, dest, 0, length);
 		return dest;
 	}
 }
