@@ -1553,7 +1553,7 @@ public class DsReader {
      */
     public static Map<String, Object> read(Statement stmt, String sql) throws SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
-            return DsMapFactory.read(rs);
+            return DsMapReader.read(rs);
         }
     }
 
@@ -1565,7 +1565,7 @@ public class DsReader {
      */
     public static Map<String, Object> read(PreparedStatement stmt) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
-            return DsMapFactory.read(rs);
+            return DsMapReader.read(rs);
         }
     }
 
@@ -1578,7 +1578,7 @@ public class DsReader {
      */
     public static void read(Statement stmt, String sql, Map<String, Object> out) throws SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
-            DsMapFactory.read(rs, out);
+            DsMapReader.read(rs, out);
         }
     }
 
@@ -1590,7 +1590,7 @@ public class DsReader {
      */
     public static void read(PreparedStatement stmt, Map<String, Object> out) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
-            DsMapFactory.read(rs, out);
+            DsMapReader.read(rs, out);
         }
     }
 
@@ -1603,7 +1603,7 @@ public class DsReader {
      */
     public static ArrayList<Map<String, Object>> readArray(Statement stmt, String sql) throws SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
-            return DsMapFactory.readArray(rs);
+            return DsMapReader.readArray(rs);
         }
     }
 
@@ -1615,7 +1615,7 @@ public class DsReader {
      */
     public static ArrayList<Map<String, Object>> readArray(PreparedStatement stmt) throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
-            return DsMapFactory.readArray(rs);
+            return DsMapReader.readArray(rs);
         }
     }
 
@@ -1630,7 +1630,7 @@ public class DsReader {
     public static ArrayList<Map<String, Object>> readArray(Statement stmt, String sql, int limit) throws SQLException {
         ArrayList<Map<String, Object>> list = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery(sql)) {
-            DsMapFactory.readArray(rs, list, limit);
+            DsMapReader.readArray(rs, list, limit);
         }
         return list;
     }
@@ -1645,7 +1645,7 @@ public class DsReader {
     public static ArrayList<Map<String, Object>> readArray(PreparedStatement stmt, int limit) throws SQLException {
         ArrayList<Map<String, Object>> list = new ArrayList<>();
         try (ResultSet rs = stmt.executeQuery()) {
-            DsMapFactory.readArray(rs, list, limit);
+            DsMapReader.readArray(rs, list, limit);
         }
         return list;
     }
@@ -1662,7 +1662,7 @@ public class DsReader {
             throws SQLException {
         try (ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                DsMapFactory.readArray(rs, collection, limit);
+                DsMapReader.readArray(rs, collection, limit);
             }
         }
     }
@@ -1678,7 +1678,7 @@ public class DsReader {
             throws SQLException {
         try (ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                DsMapFactory.readArray(rs, collection, limit);
+                DsMapReader.readArray(rs, collection, limit);
             }
         }
     }

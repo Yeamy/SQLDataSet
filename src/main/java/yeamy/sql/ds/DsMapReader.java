@@ -5,7 +5,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
 
-public class DsMapFactory {
+public class DsMapReader {
 
     private static ArrayList<String> findColumnIndex(ResultSet rs) throws SQLException {
         ArrayList<String> fields = new ArrayList<>();
