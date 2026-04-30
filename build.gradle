@@ -1,8 +1,16 @@
 plugins {
-    id 'java'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+//    id 'io.github.yeamy.sonatype-publish'
 }
 
-group 'io.github.yeamy'
+var $groupId = 'io.github.yeamy'
+var $artifactId = 'sqldataset'
+var $version = '2.2'
+
+group = $groupId
+version = $version
 
 repositories {
     mavenCentral()
@@ -20,16 +28,11 @@ dependencies {
 
 apply plugin: 'maven-publish'
 
-jar {// package code
-    archiveFileName = 'lib.jar'
-//    archiveFileName = 'sqldataset_' + version +'.jar'
-}
 tasks.register('generateSourceJar', Jar) {
     archiveClassifier.set('sources')
-    from sourceSets.main.java.srcDirs
-    archiveFileName = 'lib-sources.jar'
-//    archiveFileName = 'sqldataset-' + version + '-sources.jar'
+    from sourceSets.main.allSource
 }
+
 javadoc {// create document
     source = sourceSets.main.java.srcDirs
     options {
@@ -40,10 +43,8 @@ javadoc {// create document
         links "http://docs.oracle.com/javase/8/docs/api"
     }
 }
+
 tasks.register('generateJavadoc', Jar) { // package document as jar
-    group = 'jar'
-    archiveFileName = 'lib-javadoc.jar'
-//    archiveFileName = 'sqldataset-' + version + '-javadoc.jar'
     archiveClassifier.set('javadoc')
     from "$rootDir/javadoc"
 }
@@ -51,11 +52,13 @@ tasks.register('generateJavadoc', Jar) { // package document as jar
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId 'io.github.yeamy'
-            artifactId 'sqldataset'
-            version '2.0'
+            from components.java
+
+            groupId = $groupId
+            artifactId = $artifactId
+            version = $version
             pom {
-                name = 'sqldataset'
+                name = $artifactId
                 description = 'Deserialize data from JDBC ResultSet as java bean.'
                 url = 'https://github.com/Yeamy/SQLDataSet'
                 inceptionYear = '2022'
@@ -86,14 +89,13 @@ publishing {
                 }
             }
             artifact generateSourceJar
-            artifact jar
             artifact generateJavadoc
         }
     }
 
     repositories {
         maven {
-            url = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            url "http://127.0.0.1:8082"
             credentials {
                 username ossrhUsername
                 password ossrhPassword
@@ -106,3 +108,8 @@ apply plugin: 'signing'
 signing {
     sign publishing.publications.maven
 }
+//
+//sonatypePublish {
+//    port = 8082
+//    autoPublish = false
+//}
