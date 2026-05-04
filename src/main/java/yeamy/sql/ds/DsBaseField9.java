@@ -30,32 +30,46 @@ class DsBaseField9 extends DsField {
     public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         switch (dsType) {
             case _boolean:
+                field.setBoolean(t, rs.getBoolean(columnIndex));
+                break;
             case Boolean:
-                vh.set(t, rs.getBoolean(columnIndex));
+                field.set(t, rs.getBoolean(columnIndex));
                 break;
             case _byte:
+                field.setByte(t, rs.getByte(columnIndex));
+                break;
             case Byte:
-                vh.set(t, rs.getByte(columnIndex));
+                field.set(t, rs.getByte(columnIndex));
                 break;
             case _short:
+                field.setShort(t, rs.getShort(columnIndex));
+                break;
             case Short:
-                vh.set(t, rs.getShort(columnIndex));
+                field.set(t, rs.getShort(columnIndex));
                 break;
             case _int:
+                field.setInt(t, rs.getInt(columnIndex));
+                break;
             case Integer:
-                vh.set(t, rs.getInt(columnIndex));
+                field.set(t, rs.getInt(columnIndex));
                 break;
             case _long:
+                field.setLong(t, rs.getLong(columnIndex));
+                break;
             case Long:
-                vh.set(t, rs.getLong(columnIndex));
+                field.set(t, rs.getLong(columnIndex));
                 break;
             case _float:
+                field.setFloat(t, rs.getFloat(columnIndex));
+                break;
             case Float:
-                vh.set(t, rs.getFloat(columnIndex));
+                field.set(t, rs.getFloat(columnIndex));
                 break;
             case _double:
+                field.setDouble(t, rs.getDouble(columnIndex));
+                break;
             case Double:
-                vh.set(t, rs.getDouble(columnIndex));
+                field.set(t, rs.getDouble(columnIndex));
                 break;
             case BigDecimal:
                 vh.set(t, rs.getBigDecimal(columnIndex));

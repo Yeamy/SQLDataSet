@@ -26,32 +26,46 @@ class DsBaseField extends DsField {
     public void read(ResultSet rs, Object t, InternalDsFactory<?> factory) throws SQLException, ReflectiveOperationException {
         switch (dsType) {
             case _boolean:
-            case Boolean:
                 field.setBoolean(t, rs.getBoolean(columnIndex));
                 break;
+            case Boolean:
+                field.set(t, rs.getBoolean(columnIndex));
+                break;
             case _byte:
-            case Byte:
                 field.setByte(t, rs.getByte(columnIndex));
                 break;
+            case Byte:
+                field.set(t, rs.getByte(columnIndex));
+                break;
             case _short:
-            case Short:
                 field.setShort(t, rs.getShort(columnIndex));
                 break;
+            case Short:
+                field.set(t, rs.getShort(columnIndex));
+                break;
             case _int:
-            case Integer:
                 field.setInt(t, rs.getInt(columnIndex));
                 break;
+            case Integer:
+                field.set(t, rs.getInt(columnIndex));
+                break;
             case _long:
-            case Long:
                 field.setLong(t, rs.getLong(columnIndex));
                 break;
+            case Long:
+                field.set(t, rs.getLong(columnIndex));
+                break;
             case _float:
-            case Float:
                 field.setFloat(t, rs.getFloat(columnIndex));
                 break;
+            case Float:
+                field.set(t, rs.getFloat(columnIndex));
+                break;
             case _double:
-            case Double:
                 field.setDouble(t, rs.getDouble(columnIndex));
+                break;
+            case Double:
+                field.set(t, rs.getDouble(columnIndex));
                 break;
             case BigDecimal:
                 field.set(t, rs.getBigDecimal(columnIndex));
