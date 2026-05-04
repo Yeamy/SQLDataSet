@@ -65,4 +65,8 @@ public class ByteArray {
 		System.arraycopy(array, 0, dest, 0, length);
 		return dest;
 	}
+
+	public int length() {
+		return length;
+	}
 }
