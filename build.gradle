@@ -2,7 +2,7 @@ plugins {
     id 'java-library'
     id 'maven-publish'
     id 'signing'
-//    id 'io.github.yeamy.sonatype-publish'
+    id 'io.github.yeamy.sonatype-publish' version "1.0"
 }
 
 var $groupId = 'io.github.yeamy'
@@ -108,8 +108,8 @@ apply plugin: 'signing'
 signing {
     sign publishing.publications.maven
 }
-//
-//sonatypePublish {
-//    port = 8082
-//    autoPublish = false
-//}
+
+sonatypePublish {
+    port = 8082
+    autoPublish = false
+}
